@@ -38,7 +38,7 @@ const Navbar = () => {
           </div>
           <div className="flex items-center space-x-4">
             <div>{currentTime.toLocaleDateString()} {currentTime.toLocaleTimeString()}</div>
-            <a href="/" className="hover:underline">Poczta</a>
+            <a href="https://outlook.office.com/mail/" target="_blank" className="hover:underline">Poczta</a>
 
             <a onClick={() => navigate("/login")} className="hover:underline cursor-pointer">Zaloguj</a>
             <a onClick={() => navigate("/register")} className="hover:underline cursor-pointer">Rejestracja</a>
