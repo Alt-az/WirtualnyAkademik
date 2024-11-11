@@ -8,12 +8,12 @@ const LoginPage = () => {
 
   const formik = useFormik({
     initialValues: {
-      login: "",
+      username: "",
       password: "",
     },
     onSubmit: async (values) => {
       try {
-        AuthService.login(values.login, values.password).then((response) => {
+        AuthService.login(values.username, values.password).then((response) => {
           localStorage.setItem("token", response.data.token);
         });
         navigate("/");
@@ -32,12 +32,12 @@ const LoginPage = () => {
               </label>
               <input
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="login"
+                  id="username"
                   type="text"
-                  name="login"
-                  value={formik.values.login}
+                  name="username"
+                  value={formik.values.username}
                   onChange={formik.handleChange}
-                  placeholder="Login"
+                  placeholder="Nazwa użytkownika"
               />
             </div>
             <div className="mb-6">

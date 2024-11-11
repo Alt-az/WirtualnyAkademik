@@ -1,6 +1,7 @@
 import '../styles.css';
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
+import {getUsernameFromToken} from "../service/utils.ts";
 
 const Navbar = () => {
 
@@ -40,8 +41,10 @@ const Navbar = () => {
             <div>{currentTime.toLocaleDateString()} {currentTime.toLocaleTimeString()}</div>
             <a href="https://outlook.office.com/mail/" target="_blank" className="hover:underline">Poczta</a>
 
-            <a onClick={() => navigate("/login")} className="hover:underline cursor-pointer">Zaloguj</a>
-            <a onClick={() => navigate("/register")} className="hover:underline cursor-pointer">Rejestracja</a>
+            {!isLoggedIn && <>
+                <a onClick={() => navigate("/login")} className="hover:underline cursor-pointer">Zaloguj</a>
+                <a onClick={() => navigate("/register")} className="hover:underline cursor-pointer">Rejestracja</a>
+            </>}
 
             <div className="flex items-center">
               <div className="border-l border-gray-400 h-6 mx-2"></div>
@@ -55,14 +58,15 @@ const Navbar = () => {
                   </a>
                 </div>
               </div>
-              <div className="border-l border-gray-400 h-6 mx-2"></div>
-              <div className="relative">
-                <div onClick={toggleUserDropdown} className="flex items-center space-x-2 cursor-pointer">
-                  <div className="w-8 h-8 bg-gray-600 text-white rounded-full flex items-center justify-center">
-                    JK
+              {isLoggedIn && <div className="relative">
+                  <div onClick={toggleUserDropdown} className="flex items-center space-x-2 cursor-pointer">
+                      <div className="border-l border-gray-400 h-6 mx-2"></div>
+
+                      <div className="w-8 h-8 bg-gray-600 text-white rounded-full flex items-center justify-center">
+                          JK
+                      </div>
+                      <div>{getUsernameFromToken()}</div>
                   </div>
-                  <div>Jan Kowalski</div>
-                </div>
                 {isUserDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">
                       <a onClick={() => navigate("/edit-profile")}
@@ -71,7 +75,7 @@ const Navbar = () => {
                          className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">Wyloguj</a>
                     </div>
                 )}
-              </div>
+              </div>}
             </div>
           </div>
         </div>

@@ -1,18 +1,18 @@
 import axios from "axios";
 import {AUTH_URL} from "../../const.ts";
 
-const login = (login: string, password: string) => {
+const login = (username: string, password: string) => {
   return axios
-      .post(AUTH_URL + "/login", {login, password})
+      .post(AUTH_URL + "/login", {username, password})
 };
 
 const register = (
-    login: string,
+    username: string,
     password: string,
 ) => {
   return axios.post(
       AUTH_URL + `/register`,
-      {login, password},
+      {username, password},
   );
 };
 
