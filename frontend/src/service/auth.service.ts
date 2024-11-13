@@ -6,13 +6,16 @@ const login = (username: string, password: string) => {
       .post(AUTH_URL + "/login", {username, password})
 };
 
-const register = (
-    username: string,
-    password: string,
-) => {
+const register = (username: string, password: string, recaptchaToken: string) => {
   return axios.post(
       AUTH_URL + `/register`,
-      {username, password},
+      {
+        user: {
+          username,
+          password,
+        },
+        recaptchaToken,
+      }
   );
 };
 

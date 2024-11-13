@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useFormik } from 'formik';
 import AuthService from '../../service/auth.service.ts';
 import { useNavigate } from 'react-router-dom';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const recaptchaRef = useRef(null);
 
   const formik = useFormik({
     initialValues: {
@@ -12,12 +14,23 @@ const RegisterPage = () => {
       password: "",
     },
     onSubmit: async (values) => {
+      const recaptchaValue = recaptchaRef.current.getValue();
+      if (!recaptchaValue) {
+        alert("Please complete the reCAPTCHA");
+        return;
+      }
+
       try {
-        AuthService.register(values.username, values.password).then((response) => {
-          localStorage.setItem("token", response.data.token);
-        });
+        const response = await AuthService.register(
+            values.username,
+            values.password,
+            recaptchaValue
+        );
+        localStorage.setItem("token", response.data.token);
         navigate("/");
-      } catch (error) {}
+      } catch (error) {
+        console.error(error);
+      }
     },
   });
 
@@ -52,6 +65,12 @@ const RegisterPage = () => {
                   value={formik.values.password}
                   onChange={formik.handleChange}
                   placeholder="Hasło"
+              />
+            </div>
+            <div className="mb-6">
+              <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey="6LdSuX0qAAAAAI2IQpPxdzOKRuAZHl82c4KtARlA"
               />
             </div>
             <div className="flex items-center justify-end">
