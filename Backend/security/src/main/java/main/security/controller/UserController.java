@@ -61,10 +61,19 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Users user) {
+    public ResponseEntity<?> login(@RequestBody Users user) {
         System.out.println("login");
-        return ResponseEntity.ok("{\"token\": \"" + service.verify(user)+ "\"}");
+        String token = service.verify(user);
+
+        if ("fail".equals(token)) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Niepoprawne dane logowania. Spróbuj ponownie.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        return ResponseEntity.ok("{\"token\": \"" + token + "\"}");
     }
+
 
     @PostMapping("/validate-token")
     public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token) {
