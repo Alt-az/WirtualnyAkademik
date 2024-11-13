@@ -45,6 +45,11 @@ public class UserService {
             return "fail";
         }
     }
+
+    public String generateToken(Users user) {
+        return jwtService.generateToken(user.getUsername());
+    }
+
     public String extractUserName(String token) {
         return jwtService.extractUserName(token);
     }
