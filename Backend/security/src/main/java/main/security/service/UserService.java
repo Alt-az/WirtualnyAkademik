@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     @Autowired
+    private CaptchaService captchaService;
+
+    @Autowired
     private JWTService jwtService;
 
     @Autowired
@@ -23,11 +26,12 @@ public class UserService {
     @Autowired
     private UserRepo repo;
 
-
-
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-    public Users register(Users user) {
+    public Users register(Users user, String recaptchaToken) {
+        if (!captchaService.verifyCaptcha(recaptchaToken)) {
+            throw new RuntimeException("Invalid reCAPTCHA");
+        }
         user.setPassword(encoder.encode(user.getPassword()));
         repo.save(user);
         return user;

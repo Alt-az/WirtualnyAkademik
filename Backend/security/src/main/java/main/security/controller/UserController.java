@@ -2,6 +2,7 @@ package main.security.controller;
 
 
 import main.security.model.UserPrincipal;
+import main.security.model.UserRegistrationRequest;
 import main.security.model.Users;
 import main.security.service.MyUserDetailsService;
 import main.security.service.UserService;
@@ -27,9 +28,9 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public Users register(@RequestBody Users user) {
+    public Users register(@RequestBody UserRegistrationRequest request) {
         System.out.println("register");
-        return service.register(user);
+        return service.register(request.getUser(), request.getRecaptchaToken());
 
     }
 
