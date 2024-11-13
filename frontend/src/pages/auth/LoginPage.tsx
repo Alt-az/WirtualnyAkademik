@@ -1,10 +1,11 @@
-import React from 'react';
-import {useFormik} from "formik";
-import AuthService from "../../service/auth.service.ts";
-import {useNavigate} from "react-router-dom";
+import React, { useState } from 'react';
+import { useFormik } from 'formik';
+import AuthService from '../../service/auth.service.ts';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [loginError, setLoginError] = useState('');
 
   const formik = useFormik({
     initialValues: {
@@ -13,11 +14,20 @@ const LoginPage = () => {
     },
     onSubmit: async (values) => {
       try {
-        AuthService.login(values.username, values.password).then((response) => {
+        const response = await AuthService.login(values.username, values.password);
+
+        if (response.data.token) {
           localStorage.setItem("token", response.data.token);
-        });
-        navigate("/");
-      } catch (error) {}
+          setLoginError('');
+          navigate("/");
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          setLoginError(error.response.data.error || "Niepoprawne dane logowania. Spróbuj ponownie.");
+        } else {
+          setLoginError("Wystąpił nieoczekiwany błąd. Spróbuj ponownie później.");
+        }
+      }
     },
   });
 
@@ -27,7 +37,7 @@ const LoginPage = () => {
           <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">Logowanie</h2>
           <form onSubmit={formik.handleSubmit}>
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="login">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
                 Login
               </label>
               <input
@@ -54,6 +64,13 @@ const LoginPage = () => {
                   placeholder="Hasło"
               />
             </div>
+
+            {loginError && (
+                <div className="mb-4 text-red-600 bg-red-100 border border-red-500 p-3 rounded">
+                  {loginError}
+                </div>
+            )}
+
             <div className="flex items-center justify-end">
               <button
                   className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
