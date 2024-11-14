@@ -98,9 +98,9 @@ const RegisterPage = () => {
               </label>
               <input
                   className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-300`}
-                  id="firstName"
+                  id="name"
                   type="text"
-                  name="firstName"
+                  name="name"
                   // value={formik.values.username}
                   // onChange={formik.handleChange}
                   placeholder="Imię"
@@ -113,9 +113,9 @@ const RegisterPage = () => {
               </label>
               <input
                   className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-300`}
-                  id="lastName"
+                  id="surname"
                   type="text"
-                  name="lastName"
+                  name="surname"
                   // value={formik.values.username}
                   // onChange={formik.handleChange}
                   placeholder="Nazwisko"

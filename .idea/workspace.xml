@@ -5,11 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8499038d-1edd-476b-ba82-d3ab1d16d695" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/config/EmailManagerConfiguration.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/service/EmailService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/security/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/security/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/SecurityApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/SecurityApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/config/EmailManagerConfiguration.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/service/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/service/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/security/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/security/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/auth/RegisterPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/auth/RegisterPage.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,7 +50,7 @@
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Spring Boot.GatewayApplication.executor&quot;: &quot;Run&quot;,
     &quot;Spring Boot.SecurityApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;activation__code&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -62,7 +66,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="npm.dev">
+  <component name="RunManager" selected="Spring Boot.SecurityApplication">
     <configuration name="GatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <module name="gateway" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="main.gateway.GatewayApplication" />
@@ -106,8 +110,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.dev" />
         <item itemvalue="Spring Boot.GatewayApplication" />
+        <item itemvalue="npm.dev" />
         <item itemvalue="npm.build" />
       </list>
     </recent_temporary>
@@ -128,7 +132,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1731532478872</updated>
-      <workItem from="1731532479819" duration="17339000" />
+      <workItem from="1731532479819" duration="19970000" />
     </task>
     <servers />
   </component>

@@ -32,6 +32,7 @@ public class UserService {
         if (!captchaService.verifyCaptcha(recaptchaToken)) {
             throw new RuntimeException("Invalid reCAPTCHA");
         }
+        System.out.println("Helllo");
         user.setPassword(encoder.encode(user.getPassword()));
         repo.save(user);
         return user;
