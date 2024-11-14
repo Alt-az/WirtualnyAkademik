@@ -5,15 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8499038d-1edd-476b-ba82-d3ab1d16d695" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/service/ValidationCodeService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/config/EmailManagerConfiguration.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/service/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/security/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/security/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/model/Users.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/model/Users.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/repo/ValidationCodeRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/security/src/main/java/main/security/repo/ValidationCodeRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/security/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/security/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +46,7 @@
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Spring Boot.GatewayApplication.executor&quot;: &quot;Run&quot;,
     &quot;Spring Boot.SecurityApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;activation__code&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -132,7 +128,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1731532478872</updated>
-      <workItem from="1731532479819" duration="13903000" />
+      <workItem from="1731532479819" duration="17339000" />
     </task>
     <servers />
   </component>
