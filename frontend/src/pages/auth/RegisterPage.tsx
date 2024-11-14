@@ -117,7 +117,6 @@ const RegisterPage = () => {
                 Imię
               </label>
               <input
-<<<<<<< HEAD
                   className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
                       serverErrors.name ? 'border-red-500' : 'border-gray-300'
                   }`}
@@ -126,14 +125,6 @@ const RegisterPage = () => {
                   name="name"
                   value={formik.values.name}
                   onChange={formik.handleChange}
-=======
-                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-300`}
-                  id="name"
-                  type="text"
-                  name="name"
-                  // value={formik.values.username}
-                  // onChange={formik.handleChange}
->>>>>>> e788c7d988d4b09a2010becc2bfafb78d489d160
                   placeholder="Imię"
               />
               {serverErrors.name && (
@@ -149,7 +140,6 @@ const RegisterPage = () => {
                 Nazwisko
               </label>
               <input
-<<<<<<< HEAD
                   className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
                       serverErrors.surname ? 'border-red-500' : 'border-gray-300'
                   }`}
@@ -158,14 +148,6 @@ const RegisterPage = () => {
                   name="surname"
                   value={formik.values.surname}
                   onChange={formik.handleChange}
-=======
-                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-300`}
-                  id="surname"
-                  type="text"
-                  name="surname"
-                  // value={formik.values.username}
-                  // onChange={formik.handleChange}
->>>>>>> e788c7d988d4b09a2010becc2bfafb78d489d160
                   placeholder="Nazwisko"
               />
               {serverErrors.surname && (
