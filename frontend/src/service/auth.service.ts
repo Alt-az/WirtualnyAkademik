@@ -5,7 +5,7 @@ const login = (username: string, password: string) => {
     return axios.post(AUTH_URL + "/login", { username, password });
 };
 
-const register = (username, password, email, name, surname, recaptchaToken) => {
+const register = (username: string, password: string, email: string, name: string, surname: string, recaptchaToken: string) => {
     return axios.post(
         AUTH_URL + `/register`,
         {
