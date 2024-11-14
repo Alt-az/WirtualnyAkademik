@@ -3,7 +3,6 @@ package main.security.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 
 import java.util.Set;
 
@@ -13,10 +12,9 @@ public class Users {
     @GeneratedValue
     private int id;
     private String email;
-    @Column(name = "name",nullable = false)
-    @Size(min = 3)
+    private String name;
+    private String surname;
     private String username;
-    @JsonIgnore
     private String password;
     //@JsonBackReference
     //@ManyToMany(mappedBy = "user")
@@ -52,7 +50,21 @@ public class Users {
     public void setEmail(String email) {
         this.email = email;
     }
+    public String getSurname() {
+        return surname;
+    }
 
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
     @Override
     public String toString() {
         return "Users{" +

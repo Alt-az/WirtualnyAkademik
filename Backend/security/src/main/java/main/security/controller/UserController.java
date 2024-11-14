@@ -4,6 +4,7 @@ import main.security.model.UserRegistrationRequest;
 import main.security.model.Users;
 import main.security.service.MyUserDetailsService;
 import main.security.service.UserService;
+import main.security.service.ValidationCodeService;
 import main.security.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,9 @@ public class UserController {
 
     @Autowired
     private UserService service;
+
+    @Autowired
+    private ValidationCodeService validationCodeService;
 
     @Autowired
     MyUserDetailsService userDetailsService;
