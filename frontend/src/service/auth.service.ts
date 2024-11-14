@@ -2,26 +2,28 @@ import axios from "axios";
 import {AUTH_URL} from "../../const.ts";
 
 const login = (username: string, password: string) => {
-  return axios
-      .post(AUTH_URL + "/login", {username, password})
+    return axios.post(AUTH_URL + "/login", { username, password });
 };
 
-const register = (username: string, password: string, recaptchaToken: string) => {
-  return axios.post(
-      AUTH_URL + `/register`,
-      {
-        user: {
-          username,
-          password,
-        },
-        recaptchaToken,
-      }
-  );
+const register = (username, password, email, name, surname, recaptchaToken) => {
+    return axios.post(
+        AUTH_URL + `/register`,
+        {
+            user: {
+                username,
+                password,
+                email,
+                name,
+                surname
+            },
+            recaptchaToken
+        }
+    );
 };
 
 const AuthService = {
-  login,
-  register
-}
+    login,
+    register
+};
 
 export default AuthService;
