@@ -9,6 +9,8 @@ import main.security.service.UserService;
 import main.security.service.ValidationCodeService;
 import main.security.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,6 +44,7 @@ public class UserController {
 
 
     //@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRegistrationRequest request) throws MessagingException {
         System.out.println("register");
