@@ -51,7 +51,7 @@ const RegisterPage = () => {
   });
 
   return (
-      <div className="flex items-center justify-center pt-48">
+      <div className="flex items-center justify-center pt-4">
         <div className="bg-white p-8 rounded shadow-xl w-full max-w-md">
           <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">Rejestracja</h2>
           <form onSubmit={formik.handleSubmit}>
@@ -77,7 +77,52 @@ const RegisterPage = () => {
               )}
             </div>
 
-            <div className="mb-6">
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+                E-mail
+              </label>
+              <input
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-300`}
+                  id="email"
+                  type="text"
+                  name="email"
+                  // value={formik.values.username}
+                  // onChange={formik.handleChange}
+                  placeholder="E-mail"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+                Imię
+              </label>
+              <input
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-300`}
+                  id="firstName"
+                  type="text"
+                  name="firstName"
+                  // value={formik.values.username}
+                  // onChange={formik.handleChange}
+                  placeholder="Imię"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+                Nazwisko
+              </label>
+              <input
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-300`}
+                  id="lastName"
+                  type="text"
+                  name="lastName"
+                  // value={formik.values.username}
+                  // onChange={formik.handleChange}
+                  placeholder="Nazwisko"
+              />
+            </div>
+
+            <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
                 Hasło
               </label>
