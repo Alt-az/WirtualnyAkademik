@@ -41,6 +41,7 @@ public class UserController {
     private UserValidator validator;
 
 
+    //@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRegistrationRequest request) throws MessagingException {
         System.out.println("register");
@@ -70,6 +71,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    //@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Users user) {
