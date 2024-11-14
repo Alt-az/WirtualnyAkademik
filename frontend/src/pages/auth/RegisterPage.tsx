@@ -14,6 +14,9 @@ const RegisterPage = () => {
     initialValues: {
       username: "",
       password: "",
+      email: "",
+      name: "",
+      surname: ""
     },
     onSubmit: async (values) => {
       const recaptchaValue = recaptchaRef.current.getValue();
@@ -27,6 +30,9 @@ const RegisterPage = () => {
         const response = await AuthService.register(
             values.username,
             values.password,
+            values.email,
+            values.name,
+            values.surname,
             recaptchaValue
         );
         localStorage.setItem("token", response.data.token);
@@ -42,6 +48,9 @@ const RegisterPage = () => {
           formik.setTouched({
             username: true,
             password: true,
+            email: true,
+            name: true,
+            surname: true
           });
         } else {
           alert("Wystąpił nieoczekiwany błąd. Spróbuj ponownie później.");
@@ -55,6 +64,8 @@ const RegisterPage = () => {
         <div className="bg-white p-8 rounded shadow-xl w-full max-w-md">
           <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">Rejestracja</h2>
           <form onSubmit={formik.handleSubmit}>
+
+            {/* Username Field */}
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
                 Login
@@ -77,51 +88,76 @@ const RegisterPage = () => {
               )}
             </div>
 
+            {/* Email Field */}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
                 E-mail
               </label>
               <input
-                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-300`}
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                      serverErrors.email ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   id="email"
                   type="text"
                   name="email"
-                  // value={formik.values.username}
-                  // onChange={formik.handleChange}
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
                   placeholder="E-mail"
               />
+              {serverErrors.email && (
+                  <div className="mt-2 p-3 bg-red-100 border border-red-500 rounded text-red-700 text-sm">
+                    {serverErrors.email}
+                  </div>
+              )}
             </div>
 
+            {/* Name Field */}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
                 Imię
               </label>
               <input
-                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-300`}
-                  id="firstName"
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                      serverErrors.name ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  id="name"
                   type="text"
-                  name="firstName"
-                  // value={formik.values.username}
-                  // onChange={formik.handleChange}
+                  name="name"
+                  value={formik.values.name}
+                  onChange={formik.handleChange}
                   placeholder="Imię"
               />
+              {serverErrors.name && (
+                  <div className="mt-2 p-3 bg-red-100 border border-red-500 rounded text-red-700 text-sm">
+                    {serverErrors.name}
+                  </div>
+              )}
             </div>
 
+            {/* Surname Field */}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="surname">
                 Nazwisko
               </label>
               <input
-                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-300`}
-                  id="lastName"
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                      serverErrors.surname ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  id="surname"
                   type="text"
-                  name="lastName"
-                  // value={formik.values.username}
-                  // onChange={formik.handleChange}
+                  name="surname"
+                  value={formik.values.surname}
+                  onChange={formik.handleChange}
                   placeholder="Nazwisko"
               />
+              {serverErrors.surname && (
+                  <div className="mt-2 p-3 bg-red-100 border border-red-500 rounded text-red-700 text-sm">
+                    {serverErrors.surname}
+                  </div>
+              )}
             </div>
 
+            {/* Password Field */}
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
                 Hasło
@@ -144,6 +180,7 @@ const RegisterPage = () => {
               )}
             </div>
 
+            {/* reCAPTCHA */}
             <div className="mb-6">
               <ReCAPTCHA
                   ref={recaptchaRef}
@@ -157,6 +194,7 @@ const RegisterPage = () => {
               )}
             </div>
 
+            {/* Submit Button */}
             <div className="flex items-center justify-end">
               <button
                   className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
