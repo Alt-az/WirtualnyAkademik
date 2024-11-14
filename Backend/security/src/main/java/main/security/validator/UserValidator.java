@@ -1,6 +1,8 @@
 package main.security.validator;
 
 import main.security.model.Users;
+import main.security.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -13,6 +15,9 @@ public class UserValidator implements Validator {
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public boolean supports(Class<?> clazz) {
         return Users.class.isAssignableFrom(clazz);
@@ -24,6 +29,8 @@ public class UserValidator implements Validator {
 
         if (user.getUsername() == null || user.getUsername().length() < 5) {
             errors.rejectValue("username", "user.username.tooShort", "Login musi mieć co najmniej 5 znaków.");
+        } else if (userService.existsByUsername(user.getUsername())) {
+            errors.rejectValue("username", "user.username.exists", "Login jest już zajęty.");
         }
 
         if (user.getPassword() == null || !PASSWORD_PATTERN.matcher(user.getPassword()).matches()) {
@@ -40,6 +47,8 @@ public class UserValidator implements Validator {
 
         if (user.getEmail() == null || !EMAIL_PATTERN.matcher(user.getEmail()).matches()) {
             errors.rejectValue("email", "user.email.invalid", "Podaj poprawny adres email.");
+        } else if (userService.existsByEmail(user.getEmail())) {
+            errors.rejectValue("email", "user.email.exists", "Email jest już zajęty.");
         }
     }
 }

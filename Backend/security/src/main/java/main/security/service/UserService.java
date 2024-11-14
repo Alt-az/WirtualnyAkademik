@@ -57,4 +57,12 @@ public class UserService {
     public boolean validateToken(String token, UserDetails user) {
         return jwtService.validateToken(token, user);
     }
+
+    public boolean existsByUsername(String username) {
+        return repo.existsByUsername(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return repo.existsByEmail(email);
+    }
 }
