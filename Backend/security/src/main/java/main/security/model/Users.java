@@ -1,17 +1,26 @@
 package main.security.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
+
+import java.util.Set;
 
 @Entity
 public class Users {
     @Id
     @GeneratedValue
     private int id;
+    private String email;
+    @Column(name = "name",nullable = false)
+    @Size(min = 3)
     private String username;
+    @JsonIgnore
     private String password;
-
+    //@JsonBackReference
+    //@ManyToMany(mappedBy = "user")
+    //private Set<UserRole> roles;
     public int getId() {
         return id;
     }
@@ -34,6 +43,14 @@ public class Users {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Override
