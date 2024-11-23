@@ -23,9 +23,11 @@ public class EmailController {
 
     @GetMapping("/validate")
     public ResponseEntity<?> validateEmail(@RequestParam("token") String token) {
-        userService.activateUser(token);
+        if(userService.activateUser(token)){
+            return ResponseEntity.ok("Email validated");
+        }
         System.out.println("Email validated");
-        return ResponseEntity.ok("Email validated");
+        return ResponseEntity.badRequest().body("Email not validated");
 
     }
 }

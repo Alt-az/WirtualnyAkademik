@@ -84,4 +84,21 @@ public class UserService {
     public boolean existsByEmail(String email) {
         return userRepo.existsByEmail(email);
     }
+    public boolean changeSettings(User user){
+        User u = userRepo.findByUsername(user.getUsername());
+        u.setEmail(user.getEmail());
+        u.setName(user.getName());
+        u.setSurname(user.getSurname());
+        userRepo.save(u);
+        return true;
+    }
+    public boolean changePassword(User user){
+        User u = userRepo.findByUsername(user.getUsername());
+        u.setPassword(encoder.encode(user.getPassword()));
+        userRepo.save(u);
+        return true;
+    }
+    public User getSettings(String username){
+        return userRepo.findByUsername(username);
+    }
 }
