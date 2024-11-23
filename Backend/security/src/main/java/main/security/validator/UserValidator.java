@@ -1,6 +1,6 @@
 package main.security.validator;
 
-import main.security.model.Users;
+import main.security.model.User;
 import main.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,12 +20,12 @@ public class UserValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return Users.class.isAssignableFrom(clazz);
+        return User.class.isAssignableFrom(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        Users user = (Users) target;
+        User user = (User) target;
 
         if (user.getUsername() == null || user.getUsername().length() < 5) {
             errors.rejectValue("username", "user.username.tooShort", "Login musi mieć co najmniej 5 znaków.");

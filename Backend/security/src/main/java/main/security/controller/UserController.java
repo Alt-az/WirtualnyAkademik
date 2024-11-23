@@ -2,21 +2,18 @@ package main.security.controller;
 
 import jakarta.mail.MessagingException;
 import main.security.model.UserRegistrationRequest;
-import main.security.model.Users;
+import main.security.model.User;
 import main.security.service.EmailService;
 import main.security.service.MyUserDetailsService;
 import main.security.service.UserService;
 import main.security.service.ValidationCodeService;
 import main.security.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.DataBinder;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -64,7 +61,7 @@ public class UserController {
             return ResponseEntity.badRequest().body(errorMessages);
         }
 
-        Users registeredUser = service.register(request.getUser(), request.getRecaptchaToken());
+        User registeredUser = service.register(request.getUser(), request.getRecaptchaToken());
         String token = service.generateToken(registeredUser);
         validationCodeService.addValidationCode(registeredUser);
         emailService.sendMail("Test",validationCodeService.getValidationCode(registeredUser).getCode(),"");
@@ -77,7 +74,7 @@ public class UserController {
     //@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Users user) {
+    public ResponseEntity<?> login(@RequestBody User user) {
         System.out.println("login");
         String token = service.verify(user);
 
@@ -98,7 +95,7 @@ public class UserController {
         String username = service.extractUserName(jwt);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         try {
-            if(service.validateToken(jwt, userDetails)){
+            if(service.validateJWTToken(jwt, userDetails)){
                 return ResponseEntity.ok().body("Token valid");
             } else{
                 throw new Exception();

@@ -1,13 +1,10 @@
 package main.security.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import java.util.Set;
-
 @Entity
-public class Users {
+@Table(name = "users")
+public class User {
     @Id
     @GeneratedValue
     private int id;
@@ -16,6 +13,7 @@ public class Users {
     private String surname;
     private String username;
     private String password;
+    private boolean isActivated;
     //@JsonBackReference
     //@ManyToMany(mappedBy = "user")
     //private Set<UserRole> roles;
@@ -65,9 +63,18 @@ public class Users {
     public void setName(String name) {
         this.name = name;
     }
+
+    public boolean getIsActivated() {
+        return isActivated;
+    }
+
+    public void setIsActivated(Boolean isActivated) {
+        this.isActivated = isActivated;
+    }
+
     @Override
     public String toString() {
-        return "Users{" +
+        return "User{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +

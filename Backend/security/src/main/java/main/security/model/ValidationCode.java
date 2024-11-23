@@ -15,7 +15,7 @@ public class ValidationCode {
 
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private Users user;
+    private User user;
 
     @Column(nullable = false, unique = true)
     private String code;
@@ -40,11 +40,11 @@ public class ValidationCode {
         this.id = id;
     }
 
-    public Users getUser() {
+    public User getUser() {
         return this.user;
     }
 
-    public void setUser(Users user) {
+    public void setUser(User user) {
         this.user = user;
     }
 

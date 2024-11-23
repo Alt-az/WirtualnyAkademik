@@ -1,8 +1,10 @@
 package main.security.service;
 
 
-import main.security.model.Users;
+import main.security.model.User;
+import main.security.model.ValidationCode;
 import main.security.repo.UserRepo;
+import main.security.repo.ValidationCodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,21 +26,24 @@ public class UserService {
     AuthenticationManager authManager;
 
     @Autowired
-    private UserRepo repo;
+    private UserRepo userRepo;
+
+    @Autowired
+    private ValidationCodeService validationCodeService;
 
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-    public Users register(Users user, String recaptchaToken) {
+    public User register(User user, String recaptchaToken) {
         if (!captchaService.verifyCaptcha(recaptchaToken)) {
             throw new RuntimeException("Invalid reCAPTCHA");
         }
         System.out.println("Helllo");
         user.setPassword(encoder.encode(user.getPassword()));
-        repo.save(user);
+        userRepo.save(user);
         return user;
     }
 
-    public String verify(Users user) {
+    public String verify(User user) {
         Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
         if (authentication.isAuthenticated()) {
             return jwtService.generateToken(user.getUsername());
@@ -47,22 +52,36 @@ public class UserService {
         }
     }
 
-    public String generateToken(Users user) {
+    public String generateToken(User user) {
         return jwtService.generateToken(user.getUsername());
     }
 
     public String extractUserName(String token) {
         return jwtService.extractUserName(token);
     }
-    public boolean validateToken(String token, UserDetails user) {
+    public boolean validateJWTToken(String token, UserDetails user) {
         return jwtService.validateToken(token, user);
     }
-
+    public boolean activateUser(String code){
+        ValidationCode validationCode = validationCodeService.findByCode(code);
+        if(validationCode == null){
+            return false;
+        }
+        if(!validationCode.isActivated() && !validationCodeService.isCodeExpired(validationCode)){
+            User user = validationCode.getUser();
+            System.out.println(user);
+            user.setIsActivated(true);
+            userRepo.save(user);
+            validationCode.setActivated(true);
+            validationCodeService.save(validationCode);
+        }
+        return true;
+    }
     public boolean existsByUsername(String username) {
-        return repo.existsByUsername(username);
+        return userRepo.existsByUsername(username);
     }
 
     public boolean existsByEmail(String email) {
-        return repo.existsByEmail(email);
+        return userRepo.existsByEmail(email);
     }
 }

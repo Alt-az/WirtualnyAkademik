@@ -17,9 +17,9 @@ public class EmailService {
         MimeMessage mail = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mail, true);
         mail.setFrom("Wirtualny-akademik");
-        helper.setTo("krongjacobs@gmail.com");
+        helper.setTo("altakraz2013@gmail.com");
         mail.setSubject("Activate account");
-        String link = "http://localhost:8081/validate/" + content;
+        String link = "http://localhost:8082/email/validate?token=" + content;
         String htmlMsg = "Link aktywacyjny: <a href=\"" + link + "\">" + link + "</a>";
         helper.setText(htmlMsg, true);
         javaMailSender.send(mail);

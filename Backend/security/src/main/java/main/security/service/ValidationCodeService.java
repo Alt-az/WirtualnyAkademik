@@ -1,6 +1,6 @@
 package main.security.service;
 
-import main.security.model.Users;
+import main.security.model.User;
 import main.security.model.ValidationCode;
 import main.security.repo.ValidationCodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class ValidationCodeService {
         validationCodeRepository.deleteById(id);
     }
 
-    public void addValidationCode(Users user) {
+    public void addValidationCode(User user) {
         ValidationCode c = new ValidationCode();
         c.setCode(generateActivationCode());
         c.setUser(user);
@@ -34,7 +34,7 @@ public class ValidationCodeService {
 
         validationCodeRepository.save(c);
     }
-    public ValidationCode getValidationCode(Users user) {
+    public ValidationCode getValidationCode(User user) {
         return validationCodeRepository.findByUser(user);
     }
     public ValidationCode findByCode(String code) {
@@ -48,6 +48,7 @@ public class ValidationCodeService {
     @Scheduled(fixedRate = 30 * 1000)
     public void deleteExpiredValidationCodes()
     {
+        System.out.println("Deleting expired validation codes");
         List<ValidationCode> toDelete = validationCodeRepository.findAllByisActivatedIsFalse();
         System.out.println(toDelete);
         for(ValidationCode c:toDelete)
@@ -61,5 +62,8 @@ public class ValidationCodeService {
     }
     public static String generateActivationCode() {
         return UUID.randomUUID().toString();
+    }
+    public boolean isCodeExpired(ValidationCode validationCode){
+        return validationCode.getExpiresAt().isBefore(LocalDateTime.now());
     }
 }

@@ -2,7 +2,7 @@ package main.security.service;
 
 
 import main.security.model.UserPrincipal;
-import main.security.model.Users;
+import main.security.model.User;
 import main.security.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +19,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users user = userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username);
         if (user == null) {
             System.out.println("User Not Found");
             throw new UsernameNotFoundException("user not found");
