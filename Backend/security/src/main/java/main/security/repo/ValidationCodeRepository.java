@@ -12,5 +12,5 @@ public interface ValidationCodeRepository extends JpaRepository<ValidationCode, 
     ValidationCode deleteById(long id);
     ValidationCode findByCode(String code);
     ValidationCode findByUser(User user);
-    List<ValidationCode> findAllByisActivatedIsFalse();
+    List<ValidationCode> findAllByisActivatedFalse();
 }
