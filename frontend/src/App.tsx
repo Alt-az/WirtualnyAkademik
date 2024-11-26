@@ -6,6 +6,7 @@ import LoginPage from "./pages/auth/LoginPage.tsx";
 import RegisterPage from "./pages/auth/RegisterPage.tsx";
 import EditProfilePage from "./pages/auth/EditProfilePage.tsx";
 import ChangePasswordPage from "./pages/auth/ChangePasswordPage.tsx";
+import AnnoucementsPage from "./pages/AnnoucementsPage.tsx";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -14,6 +15,7 @@ const router = createBrowserRouter(
           <Route path="register" element={<RegisterPage />} />
           <Route path="/edit-profile" element={<EditProfilePage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />
+          <Route path="/annoucements" element={<AnnoucementsPage />} />
         </Route>,
     ),
 );

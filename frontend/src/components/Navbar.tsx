@@ -80,7 +80,7 @@ const Navbar = () => {
           </div>
         </div>
         <div className="bg-gray-700 text-white py-2 px-4 flex space-x-4">
-          <a href="/link1" className="hover:underline">Link1</a>
+          <a onClick={() => navigate("/annoucements")} className="hover:underline cursor-pointer">Ogłoszenia</a>
           <a href="/link2" className="hover:underline">Link2</a>
           <a href="/link3" className="hover:underline">Link3</a>
           <a href="/link4" className="hover:underline">Link4</a>
