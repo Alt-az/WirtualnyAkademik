@@ -2,6 +2,7 @@ import '../styles.css';
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {getUsernameFromToken} from "../service/utils.ts";
+import announcementsPage from "../pages/auth/AnnouncementsPage.tsx";
 
 const Navbar = () => {
 
@@ -80,7 +81,11 @@ const Navbar = () => {
                          className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">Edytuj profil</a>
                       <a onClick={logout}
                          className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">Wyloguj</a>
-                    </div>
+                      <a onClick={() => navigate("/announcements")}
+                         className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">Ogłoszenia</a>
+                  <a onClick={() => navigate("/announcements/add")}
+                className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">Dodaj ogłoszenie</a>
+                </div>
                 )}
               </div>}
             </div>

@@ -7,6 +7,9 @@ import RegisterPage from "./pages/auth/RegisterPage.tsx";
 import EditProfilePage from "./pages/auth/EditProfilePage.tsx";
 import ChangePasswordPage from "./pages/auth/ChangePasswordPage.tsx";
 import AdminPanel from "./pages/auth/AdminPanel.tsx";
+import AnnouncementsPage from "./pages/auth/AnnouncementsPage.tsx";
+import AddAnnouncementPage from './pages/auth/AddAnnouncementPage';
+
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<RootLayout/>}>
@@ -14,6 +17,8 @@ const router = createBrowserRouter(
           <Route path="register" element={<RegisterPage />} />
           <Route path="/edit-profile" element={<EditProfilePage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />
+            <Route path="/announcements" element={<AnnouncementsPage />} />
+            <Route path="/announcements/add" element={<AddAnnouncementPage />} />
           <Route path="/admin-panel" element={<AdminPanel/>}/>
         </Route>,
     ),
