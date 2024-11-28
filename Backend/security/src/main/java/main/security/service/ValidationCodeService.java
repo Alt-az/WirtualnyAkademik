@@ -2,21 +2,28 @@ package main.security.service;
 
 import main.security.model.User;
 import main.security.model.ValidationCode;
+import main.security.repo.UserRepo;
 import main.security.repo.ValidationCodeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
 @Service
 public class ValidationCodeService {
-    @Autowired
-    private ValidationCodeRepository validationCodeRepository;
 
-    ValidationCodeService(ValidationCodeRepository validationCodeRepository) {
+    Logger LOG = LoggerFactory.getLogger(ValidationCodeService.class);
+
+    private final ValidationCodeRepository validationCodeRepository;
+    private final UserRepo userRepository;
+
+    ValidationCodeService(ValidationCodeRepository validationCodeRepository, UserRepo userRepository) {
         this.validationCodeRepository = validationCodeRepository;
+        this.userRepository = userRepository;
     }
 
     public void removeValidationCode(long id) {
@@ -34,9 +41,11 @@ public class ValidationCodeService {
 
         validationCodeRepository.save(c);
     }
+
     public ValidationCode getValidationCode(User user) {
         return validationCodeRepository.findByUser(user);
     }
+
     public ValidationCode findByCode(String code) {
         return validationCodeRepository.findByCode(code);
     }
@@ -45,25 +54,28 @@ public class ValidationCodeService {
         validationCodeRepository.save(validationCode);
     }
 
-    @Scheduled(fixedRate = 30 * 1000)
-    public void deleteExpiredValidationCodes()
-    {
-        System.out.println("Deleting expired validation codes");
-        List<ValidationCode> toDelete = validationCodeRepository.findAllByisActivatedIsFalse();
-        System.out.println(toDelete);
-        for(ValidationCode c:toDelete)
-        {
-            if(c.getExpiresAt().isBefore(LocalDateTime.now()))
-            {
+    @Scheduled(fixedRate = 60 * 1000)
+    public void deleteExpiredValidationCodes() {
+        List<ValidationCode> toDelete = validationCodeRepository.findAllByisActivatedFalse();
+
+        for (ValidationCode c : toDelete) {
+            if (c.getExpiresAt().isBefore(LocalDateTime.now())) {
+                User userToDelete = c.getUser();
+                LOG.info("Deleting expired validation code: " + c);
                 validationCodeRepository.delete(c);
+
+                LOG.info("Deleting not activated user: " + userToDelete);
+                userRepository.delete(userToDelete);
             }
         }
 
     }
+
     public static String generateActivationCode() {
         return UUID.randomUUID().toString();
     }
-    public boolean isCodeExpired(ValidationCode validationCode){
+
+    public boolean isCodeExpired(ValidationCode validationCode) {
         return validationCode.getExpiresAt().isBefore(LocalDateTime.now());
     }
 }

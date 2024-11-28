@@ -1,6 +1,8 @@
 package main.security.model;
 
 import jakarta.persistence.*;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 @Entity
 @Table(name = "users")
@@ -14,6 +16,7 @@ public class User {
     private String username;
     private String password;
     private boolean isActivated;
+
     //@JsonBackReference
     //@ManyToMany(mappedBy = "user")
     //private Set<UserRole> roles;
@@ -73,11 +76,27 @@ public class User {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id && isActivated == user.isActivated && Objects.equals(email, user.email) && Objects.equals(name, user.name) && Objects.equals(surname, user.surname) && Objects.equals(username, user.username) && Objects.equals(password, user.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, name, surname, username, password, isActivated);
+    }
+
+    @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                '}';
+        return new StringJoiner(", ", User.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("email='" + email + "'")
+                .add("name='" + name + "'")
+                .add("surname='" + surname + "'")
+                .add("username='" + username + "'")
+                .add("password='" + password + "'")
+                .add("isActivated=" + isActivated)
+                .toString();
     }
 }
