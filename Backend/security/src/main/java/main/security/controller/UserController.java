@@ -30,4 +30,10 @@ public class UserController {
     public ResponseEntity<?> getSettings(@RequestParam("username") String username){
         return ResponseEntity.ok(userService.getSettings(username));
     }
+    @GetMapping("get-users")
+    public ResponseEntity<?> getUsers(@RequestParam("pagesize") int pageSize, @RequestParam("offset") int offset, @RequestParam("field") String field){
+        System.out.println("tujtaj");
+        return ResponseEntity.ok(userService.getAllUsers(field, pageSize, offset));
+    }
+
 }

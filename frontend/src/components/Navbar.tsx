@@ -40,10 +40,17 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             <div>{currentTime.toLocaleDateString()} {currentTime.toLocaleTimeString()}</div>
             <a href="https://outlook.office.com/mail/" target="_blank" className="hover:underline">Poczta</a>
-
+            {isLoggedIn && (
+                <button
+                    className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    onClick={() => navigate("/admin-panel")}
+                >
+                  Panel Administratora
+                </button>
+            )}
             {!isLoggedIn && <>
-                <a onClick={() => navigate("/login")} className="hover:underline cursor-pointer">Zaloguj</a>
-                <a onClick={() => navigate("/register")} className="hover:underline cursor-pointer">Rejestracja</a>
+              <a onClick={() => navigate("/login")} className="hover:underline cursor-pointer">Zaloguj</a>
+              <a onClick={() => navigate("/register")} className="hover:underline cursor-pointer">Rejestracja</a>
             </>}
 
             <div className="flex items-center">
