@@ -6,12 +6,18 @@ import main.security.model.ValidationCode;
 import main.security.repo.UserRepo;
 import main.security.repo.ValidationCodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -37,7 +43,6 @@ public class UserService {
         if (!captchaService.verifyCaptcha(recaptchaToken)) {
             throw new RuntimeException("Invalid reCAPTCHA");
         }
-        System.out.println("Helllo");
         user.setPassword(encoder.encode(user.getPassword()));
         userRepo.save(user);
         return user;
@@ -59,9 +64,11 @@ public class UserService {
     public String extractUserName(String token) {
         return jwtService.extractUserName(token);
     }
+
     public boolean validateJWTToken(String token, UserDetails user) {
         return jwtService.validateToken(token, user);
     }
+
     public boolean activateUser(String code){
         ValidationCode validationCode = validationCodeService.findByCode(code);
         if(validationCode == null){
@@ -84,6 +91,7 @@ public class UserService {
     public boolean existsByEmail(String email) {
         return userRepo.existsByEmail(email);
     }
+
     public boolean changeSettings(User user){
         User u = userRepo.findByUsername(user.getUsername());
         u.setEmail(user.getEmail());
@@ -92,6 +100,7 @@ public class UserService {
         userRepo.save(u);
         return true;
     }
+
     public boolean changePassword(User user){
         User u = userRepo.findByUsername(user.getUsername());
         u.setPassword(encoder.encode(user.getPassword()));
@@ -101,4 +110,16 @@ public class UserService {
     public User getSettings(String username){
         return userRepo.findByUsername(username);
     }
+
+    public List<User> getAllUsers(String field, int offset, int pageSize){
+        List <User> p = userRepo.findAll();
+        return p;
+    }
+
+    public boolean deleteUser(int id)
+    {
+        userRepo.deleteById(id);
+        return true;
+    }
+
 }

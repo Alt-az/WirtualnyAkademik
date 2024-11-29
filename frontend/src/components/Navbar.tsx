@@ -2,6 +2,7 @@ import '../styles.css';
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {getUsernameFromToken} from "../service/utils.ts";
+import announcementsPage from "../pages/auth/AnnouncementsPage.tsx";
 
 const Navbar = () => {
 
@@ -40,10 +41,17 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             <div>{currentTime.toLocaleDateString()} {currentTime.toLocaleTimeString()}</div>
             <a href="https://outlook.office.com/mail/" target="_blank" className="hover:underline">Poczta</a>
-
+            {isLoggedIn && (
+                <button
+                    className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    onClick={() => navigate("/admin-panel")}
+                >
+                  Panel Administratora
+                </button>
+            )}
             {!isLoggedIn && <>
-                <a onClick={() => navigate("/login")} className="hover:underline cursor-pointer">Zaloguj</a>
-                <a onClick={() => navigate("/register")} className="hover:underline cursor-pointer">Rejestracja</a>
+              <a onClick={() => navigate("/login")} className="hover:underline cursor-pointer">Zaloguj</a>
+              <a onClick={() => navigate("/register")} className="hover:underline cursor-pointer">Rejestracja</a>
             </>}
 
             <div className="flex items-center">
@@ -73,7 +81,11 @@ const Navbar = () => {
                          className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">Edytuj profil</a>
                       <a onClick={logout}
                          className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">Wyloguj</a>
-                    </div>
+                      <a onClick={() => navigate("/announcements")}
+                         className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">Ogłoszenia</a>
+                  <a onClick={() => navigate("/announcements/add")}
+                className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">Dodaj ogłoszenie</a>
+                </div>
                 )}
               </div>}
             </div>
