@@ -17,8 +17,8 @@ const router = createBrowserRouter(
           <Route path="register" element={<RegisterPage />} />
           <Route path="/edit-profile" element={<EditProfilePage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />
-            <Route path="/announcements" element={<AnnouncementsPage />} />
-            <Route path="/announcements/add" element={<AddAnnouncementPage />} />
+          <Route path="/announcements" element={<AnnouncementsPage />} />
+          <Route path="/announcements/add" element={<AddAnnouncementPage />} />
           <Route path="/admin-panel" element={<AdminPanel/>}/>
         </Route>,
     ),
