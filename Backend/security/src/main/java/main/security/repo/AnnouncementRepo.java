@@ -8,7 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AnnouncementRepo extends JpaRepository<Announcement, Integer> {
-
-    Page<Announcement> findAllByOrderByIdDesc(Pageable pageable);
-
+    Page<Announcement> findAllByOrderByPinnedDescIdDesc(Pageable pageable);
 }

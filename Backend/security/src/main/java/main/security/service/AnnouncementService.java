@@ -1,12 +1,13 @@
 package main.security.service;
 
+import main.security.dto.response.FindAllAnnouncementsResponse;
+import main.security.mapper.AnnouncementMapper;
 import main.security.model.Announcement;
 import main.security.repo.AnnouncementRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,7 +24,7 @@ public class AnnouncementService {
         return announcement;
     }
 
-    public Announcement editAnnouncement(int id, String newTitle, String newContent, int userId) {
+    public Announcement editAnnouncement(int id, String newTitle, String newContent, int userId, boolean newIsPinned) {
 
         Announcement announcement = announcementRepo.findById(id).orElse(null);
         if (announcement == null) {
@@ -41,6 +42,8 @@ public class AnnouncementService {
             announcement.setContent(newContent);
         }
 
+        announcement.setPinned(newIsPinned);
+
         return announcementRepo.save(announcement);
     }
 
@@ -57,8 +60,14 @@ public class AnnouncementService {
         announcementRepo.delete(announcement);
     }
 
-    public Page<Announcement> getAllAnnouncements(int pageNum, int pageSize) {
+    public FindAllAnnouncementsResponse getAllAnnouncements(int pageNum, int pageSize) {
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
-        return announcementRepo.findAllByOrderByIdDesc(pageable);
+
+        Page<Announcement> announcements = announcementRepo.findAllByOrderByPinnedDescIdDesc(pageable);
+
+        return new FindAllAnnouncementsResponse(
+                announcements.getTotalPages(),
+                AnnouncementMapper.mapAnnoucementListToAnoucementResponseList(announcements.getContent())
+        );
     }
 }

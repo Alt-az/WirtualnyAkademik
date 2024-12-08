@@ -15,7 +15,7 @@ export const getUsernameFromToken = () => {
         const token = localStorage.getItem("token")
         if (token == null) return "";
         const decodedToken = jwtDecode(token);
-        console.log(decodedToken)
+        // console.log(decodedToken)
         return decodedToken.sub; // Adjust this based on your token's payload structure
     } catch (error) {
         console.error("Invalid token", error);

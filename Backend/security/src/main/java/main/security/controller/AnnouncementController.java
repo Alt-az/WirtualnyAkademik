@@ -2,17 +2,15 @@ package main.security.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import main.security.dto.AnnouncementDTO;
+import main.security.dto.response.FindAllAnnouncementsResponse;
 import main.security.model.Announcement;
 import main.security.model.User;
 import main.security.repo.UserRepo;
 import main.security.service.AnnouncementService;
 import main.security.service.JWTService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -66,6 +64,7 @@ public class AnnouncementController {
         announcement.setTitle(announcementDTO.getTitle());
         announcement.setContent(announcementDTO.getContent());
         announcement.setCreator(creator);
+        announcement.setPinned(false);
 
         announcementService.addAnnouncement(announcement);
 
@@ -95,7 +94,8 @@ public class AnnouncementController {
                     announcementDTO.getId(),
                     announcementDTO.getTitle(),
                     announcementDTO.getContent(),
-                    editor.getId()
+                    editor.getId(),
+                    announcementDTO.isPinned()
             );
 
             String responseMessage = String.format(
@@ -137,13 +137,13 @@ public class AnnouncementController {
             @PathVariable int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
         try {
-            Page<Announcement> announcements = announcementService.getAllAnnouncements(pageNum, pageSize);
+            FindAllAnnouncementsResponse response = announcementService.getAllAnnouncements(pageNum, pageSize);
 
-            if (announcements.isEmpty()) {
+            if (response.announcements().isEmpty()) {
                 return ResponseEntity.ok("No announcements found.");
             }
 
-            return ResponseEntity.ok(announcements.getContent());
+            return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -1,0 +1,74 @@
+/* styles.css */
+.announcement-enter {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+.announcement-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.announcement-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.announcement-exit-active {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.modal-enter {
+    opacity: 0;
+    transform: scale(0.9);
+}
+
+.modal-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.modal-exit {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.modal-exit-active {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.button-hover:hover {
+    background-color: #1e40af; /* Change to a darker shade of blue */
+    color: white;
+}
+
+.show-more-hover:hover {
+    text-decoration: underline;
+    color: #1e40af; /* Change to a darker shade of blue */
+}
+
+.modal-enter {
+    opacity: 0;
+    transform: scale(1);
+}
+
+.modal-enter-active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.modal-exit {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.modal-exit-active {
+    opacity: 0;
+    transform: scale(1);
+}
