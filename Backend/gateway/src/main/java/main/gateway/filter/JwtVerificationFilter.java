@@ -49,7 +49,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
             checkToken(request, response, chain, token);
         } else {
             System.out.println("login or register");
-            if(requestURI.equals("/security/login") || requestURI.equals("/security/register") || requestURI.equals("/email/validate")) {
+            if(requestURI.equals("/security/login") || requestURI.equals("/security/register") || requestURI.equals("/email/validate") || requestURI.startsWith("/announcement/show")) {
                 chain.doFilter(request, response);
                 return;
             }
