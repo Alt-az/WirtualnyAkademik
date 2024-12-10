@@ -68,7 +68,7 @@ const AnnouncementsPage = () => {
                   <div className="flex justify-between items-center">
                     <h2 className="text-xl font-semibold">{announcement.title}</h2>
                     <div className="flex space-x-2">
-                      <button onClick={() => handlePinToggle(announcement.id)}
+                      {/*<button onClick={() => handlePinToggle(announcement.id)}
                               className="text-yellow-500 hover:text-yellow-700 transition duration-200">
                         <MdPushPin className="inline-block mr-1" /> {announcement.pinned ? 'Odepnij' : 'Przypnij'}
                       </button>
@@ -79,7 +79,7 @@ const AnnouncementsPage = () => {
                       <button onClick={() => handleDelete(announcement.id)}
                               className="text-red-500 hover:text-red-700 transition duration-200">
                         <MdDelete className="inline-block mr-1" /> Usuń
-                      </button>
+                      </button>*/}
                     </div>
                   </div>
                   <p className="text-gray-600">{announcement.createdAt} - {announcement.creator}</p>
