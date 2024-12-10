@@ -3,6 +3,12 @@ package main.security.model;
 import jakarta.persistence.*;
 import java.util.Objects;
 import java.util.StringJoiner;
+import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.StringJoiner;
+
 
 @Entity
 @Table(name = "users")
@@ -20,6 +26,18 @@ public class User {
     //@JsonBackReference
     //@ManyToMany(mappedBy = "user")
     //private Set<UserRole> roles;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<UserRole> roles = new HashSet<>();
+
+    public User() {
+    }
+
     public int getId() {
         return id;
     }
@@ -75,6 +93,15 @@ public class User {
         this.isActivated = isActivated;
     }
 
+    public Set<UserRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<UserRole> roles) {
+        this.roles = roles;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -97,6 +124,7 @@ public class User {
                 .add("username='" + username + "'")
                 .add("password='" + password + "'")
                 .add("isActivated=" + isActivated)
+                .add("roles=" + roles)
                 .toString();
     }
 }
