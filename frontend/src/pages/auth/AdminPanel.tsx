@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import AdminService from '../../service/admin.service.ts';
 import { IAnnouncement } from "../../model/IAnnouncement.ts";
 import AnnouncementService from "../../service/announcement.service.ts";
+import { MdDelete, MdEdit, MdPushPin } from "react-icons/md";
 
 const AdminPanel = () => {
     const [users, setUsers] = useState([]);
@@ -13,6 +14,8 @@ const AdminPanel = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [selectedSection, setSelectedSection] = useState('users');
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editAnnouncement, setEditAnnouncement] = useState<IAnnouncement | null>(null);
 
     useEffect(() => {
         if (selectedSection === 'announcements') {
@@ -44,6 +47,43 @@ const AdminPanel = () => {
 
     const nextPage = () => setOffset((prev) => prev + pageSize);
     const prevPage = () => setOffset((prev) => Math.max(0, prev - pageSize));
+
+    const handleDelete = (id: number) => {
+        if (window.confirm("Czy na pewno chcesz usunąć to ogłoszenie?")) {
+            AnnouncementService.deleteAnnouncement(id).then(() => {
+                setAnnouncements(announcements.filter(a => a.id !== id));
+            }).catch(console.error);
+        }
+    };
+    const handlePinToggle = (id: number) => {
+        const announcement = announcements.find(a => a.id === id);
+        if (announcement) {
+            AnnouncementService.togglePinAnnouncement(announcement, !announcement.pinned).then(() => {
+                setAnnouncements(announcements.map(a => a.id === id ? { ...a, pinned: !a.pinned } : a));
+            }).catch(console.error);
+        }
+    };
+
+    const handleEdit = (announcement: IAnnouncement) => {
+        setEditAnnouncement(announcement);
+        setIsEditModalOpen(true);
+    };
+
+    const handleSaveEdit = () => {
+        if (editAnnouncement) {
+            AnnouncementService.togglePinAnnouncement(editAnnouncement, editAnnouncement.pinned)
+                .then(() => {
+                    setAnnouncements(announcements.map(a => a.id === editAnnouncement.id ? editAnnouncement : a));
+                    handleCloseEditModal();
+                })
+                .catch(console.error);
+        }
+    };
+
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
+        setEditAnnouncement(null);
+    };
 
     const renderUsers = () => (
         <>
@@ -127,7 +167,42 @@ const AdminPanel = () => {
                                 <strong>Autor:</strong> {announcement.creator}
                             </p>
                             <p className="text-gray-700">{announcement.content}</p>
+                            <div className="flex space-x-4 mt-4">
+                                <button
+                                    onClick={() => handlePinToggle(announcement.id)}
+                                    className="flex items-center px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition duration-300"
+                                >
+                                    <MdPushPin className="mr-2"/> {announcement.pinned ? 'Odepnij' : 'Przypnij'}
+                                </button>
+
+                                <button
+                                    onClick={() => handleEdit(announcement)}
+                                    className="flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition duration-300"
+                                >
+                                    <MdEdit className="mr-2"/> Edytuj
+                                </button>
+
+                                <button
+                                    onClick={() => handleDelete(announcement.id)}
+                                    className="flex items-center px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition duration-300"
+                                >
+                                    <MdDelete className="mr-2"/> Usuń
+                                </button>
+                            </div>
                         </div>
+                    ))}
+                </div>
+                <div className="flex justify-center mt-4">
+                    {Array.from({length: totalPages}, (_, index) => (
+                        <button
+                            key={index + 1}
+                            onClick={() => setCurrentPage(index + 1)}
+                            className={`mx-1 px-3 py-1 border rounded ${
+                                currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'
+                            }`}
+                        >
+                            {index + 1}
+                        </button>
                     ))}
                 </div>
             </>
@@ -159,6 +234,39 @@ const AdminPanel = () => {
                 </aside>
                 <main className="flex-grow p-4 overflow-hidden">
                     {selectedSection === 'users' ? renderUsers() : renderAnnouncements()}
+                    {isEditModalOpen && editAnnouncement && (
+                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                            <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+                                <h2 className="text-xl font-bold mb-4">Edytuj Ogłoszenie</h2>
+                                <input
+                                    type="text"
+                                    value={editAnnouncement.title}
+                                    onChange={(e) => setEditAnnouncement({ ...editAnnouncement, title: e.target.value })}
+                                    className="w-full p-2 border rounded mt-2"
+                                />
+                                <textarea
+                                    value={editAnnouncement.content}
+                                    onChange={(e) => setEditAnnouncement({ ...editAnnouncement, content: e.target.value })}
+                                    className="w-full p-2 border rounded mt-2"
+                                />
+                                <div className="flex justify-end space-x-2 mt-4">
+                                    <button
+                                        onClick={() => setIsEditModalOpen(false)}
+                                        className="text-gray-500 hover:text-gray-700 transition duration-200"
+                                    >
+                                        Anuluj
+                                    </button>
+                                    <button
+                                        onClick={handleSaveEdit}
+                                        className="text-blue-500 hover:text-blue-700 transition duration-200"
+                                    >
+                                        Zapisz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                 </main>
             </div>
         </div>
