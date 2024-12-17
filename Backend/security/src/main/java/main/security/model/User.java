@@ -35,6 +35,9 @@ public class User {
     )
     private Set<UserRole> roles = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserLaundry> userLaundries = new HashSet<>();
+
     public User() {
     }
 
@@ -101,6 +104,13 @@ public class User {
         this.roles = roles;
     }
 
+    public Set<UserLaundry> getUserLaundries() {
+        return userLaundries;
+    }
+
+    public void setUserLaundries(Set<UserLaundry> userLaundries) {
+        this.userLaundries = userLaundries;
+    }
 
     @Override
     public boolean equals(Object o) {
