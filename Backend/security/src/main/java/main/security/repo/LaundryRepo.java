@@ -13,8 +13,8 @@ import java.util.List;
 
 @Repository
 public interface LaundryRepo extends JpaRepository<Laundry, Integer> {
-    public Laundry findByDateOfLaundry(LocalDateTime dateOfLaundry);
+    public Laundry findByStartTime(LocalDateTime dateOfLaundry);
     public Laundry findById(Long id);
-    @Query("SELECT l FROM Laundry l WHERE MONTH(l.dateOfLaundry) = :month AND YEAR(l.dateOfLaundry) = :year")
+    @Query("SELECT l FROM Laundry l WHERE MONTH(l.startTime) = :month AND YEAR(l.startTime) = :year")
     List<Laundry> findByMonthAndYear(@Param("month") int month, @Param("year") int year);
 }

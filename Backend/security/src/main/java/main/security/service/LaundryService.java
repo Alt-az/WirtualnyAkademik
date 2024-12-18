@@ -23,7 +23,7 @@ public class LaundryService {
         laundryRepo.save(laundry);
     }
     public void updateLaundry(LocalDateTime dateTime) {
-        Laundry laundry = laundryRepo.findByDateOfLaundry(dateTime);
+        Laundry laundry = laundryRepo.findByStartTime(dateTime);
         laundryRepo.save(laundry);
     }
     public void updateLaundry(Long id) {
