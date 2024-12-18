@@ -13,21 +13,15 @@ public class Laundry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    public String color;
+    public LocalDateTime startTime;
 
-    public String material;
+    public LocalDateTime stopTime;
 
-    public String temperature;
-
-    public LocalDateTime dateOfLaundry;
-
-    public Integer LimitOfClothes;
+    public Integer peopleLimit;
 
     public Boolean isAvailable;
 
-    public String TypeOfClothes;
-
-    public String placeOfLaundry;
+    public String location;
 
     @OneToMany(mappedBy = "laundry", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserLaundry> userLaundries = new HashSet<>();
