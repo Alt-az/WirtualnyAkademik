@@ -80,8 +80,17 @@ public class SecurityController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
         System.out.println("login");
+        if(service.existsByUsername(this.userDetailsService.loadUserByUsername(user.getUsername()).getUsername()))
+        {
+            if(service.getSettings(user.getUsername()).getIsActivated() == false)
+            {
+                Map<String, String> response = new HashMap<>();
+                System.out.println("test");
+                response.put("error", "Konto nie zostało jeszcze aktywowane.Aktywuj je by się zalogować");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        }
         String token = service.verify(user);
-
         if ("fail".equals(token)) {
             Map<String, String> response = new HashMap<>();
             response.put("error", "Niepoprawne dane logowania. Spróbuj ponownie.");

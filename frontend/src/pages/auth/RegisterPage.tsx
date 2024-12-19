@@ -27,7 +27,8 @@ const RegisterPage = () => {
       }
 
       try {
-        const response = await AuthService.register(
+        //const response =
+         await AuthService.register(
             values.username,
             values.password,
             values.email,
@@ -35,7 +36,7 @@ const RegisterPage = () => {
             values.surname,
             recaptchaValue
         );
-        localStorage.setItem("token", response.data.token);
+        //localStorage.setItem("token", response.data.token);
         navigate("/");
       } catch (error) {
         console.error("Response data:", error.response?.data);
