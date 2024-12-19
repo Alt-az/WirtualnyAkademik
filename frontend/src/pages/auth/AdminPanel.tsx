@@ -16,7 +16,8 @@ const AdminPanel = () => {
     const [selectedSection, setSelectedSection] = useState('users');
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editAnnouncement, setEditAnnouncement] = useState<IAnnouncement | null>(null);
-
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filteredUsers, setFilteredUsers] = useState([]);
     useEffect(() => {
         if (selectedSection === 'announcements') {
             AnnouncementService.findAllAnnouncements(currentPage)
@@ -34,6 +35,7 @@ const AdminPanel = () => {
             const token = localStorage.getItem('token');
             const data = await AdminService.getUsers(pageSize, offset, field, token || '');
             setUsers(data);
+            setFilteredUsers(data);
             setError('');
         } catch (err) {
             setError('Nie udało się pobrać listy użytkowników.');
@@ -45,6 +47,13 @@ const AdminPanel = () => {
         if (selectedSection === 'users') fetchUsers();
     }, [offset, selectedSection]);
 
+    const handleSearch = (term) => {
+        setSearchTerm(term);
+        const filtered = users.filter((user) =>
+            user.username.toLowerCase().includes(term.toLowerCase())
+        );
+        setFilteredUsers(filtered);
+    };
     const nextPage = () => setOffset((prev) => prev + pageSize);
     const prevPage = () => setOffset((prev) => Math.max(0, prev - pageSize));
 
@@ -55,6 +64,7 @@ const AdminPanel = () => {
             }).catch(console.error);
         }
     };
+
     const handlePinToggle = (id: number) => {
         const announcement = announcements.find(a => a.id === id);
         if (announcement) {
@@ -87,6 +97,13 @@ const AdminPanel = () => {
 
     const renderUsers = () => (
         <>
+            <input
+                type="text"
+                placeholder="Wyszukaj użytkownika po nazwie..."
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="mb-4 p-2 border rounded w-full"
+            />
             <h1 className="text-2xl font-bold mb-4">Panel Administratora - Użytkownicy</h1>
             {error && <div className="text-red-600 mb-4">{error}</div>}
             <table className="table-auto w-full border-collapse border border-gray-300 text-sm">
@@ -99,7 +116,7 @@ const AdminPanel = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {users.map((user) => (
+                {filteredUsers.map((user) => (
                     <tr key={user.id}>
                         <td className="border border-gray-300 px-2 py-1">{user.id}</td>
                         <td className="border border-gray-300 px-2 py-1">{user.username}</td>
