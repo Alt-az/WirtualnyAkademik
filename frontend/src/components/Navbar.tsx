@@ -159,7 +159,7 @@ const Navbar = () => {
             <span>Ogłoszenia</span>
           </a>
           <a
-              onClick={() => {
+              onClick={() => {navigate("/laundry-timetable")
               }}
               className="hover:text-white transition duration-200 font-medium cursor-pointer flex items-center space-x-2"
           >
