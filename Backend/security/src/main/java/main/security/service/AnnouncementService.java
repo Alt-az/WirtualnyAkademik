@@ -3,18 +3,26 @@ package main.security.service;
 import main.security.dto.response.FindAllAnnouncementsResponse;
 import main.security.mapper.AnnouncementMapper;
 import main.security.model.Announcement;
+import main.security.model.UserRole;
 import main.security.repo.AnnouncementRepo;
+import main.security.repo.UserRepo;
+import main.security.repo.UserRoleRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AnnouncementService {
 
     @Autowired
     AnnouncementRepo announcementRepo;
+
+    @Autowired
+    UserRoleRepo userRoleRepo;
 
     public Announcement addAnnouncement(Announcement announcement){
 
@@ -27,11 +35,19 @@ public class AnnouncementService {
     public Announcement editAnnouncement(int id, String newTitle, String newContent, int userId, boolean newIsPinned) {
 
         Announcement announcement = announcementRepo.findById(id).orElse(null);
+
+
+        List<UserRole> userRoles = userRoleRepo.findByUserId(userId);
         if (announcement == null) {
             throw new IllegalArgumentException("Announcement not found with id: " + id);
         }
 
-        if (announcement.getCreator().getId() != userId) {
+
+        //todo: Usunąć poniższe alternatywy kiedy zdecydujemy się na konkretną formę Admina
+        boolean isAdmin = userRoles.stream()
+                .anyMatch(role -> "Admin".equals(role.getName()) || "ROLE_ADMIN".equals(role.getName()) || "ADMIN".equals(role.getName()));
+
+        if (!isAdmin) {
             throw new IllegalArgumentException("You are not authorized to edit this announcement.");
         }
 
@@ -49,12 +65,17 @@ public class AnnouncementService {
 
     public void deleteAnnouncement(int id, int userId) {
         Announcement announcement = announcementRepo.findById(id).orElse(null);
+        List<UserRole> userRoles = userRoleRepo.findByUserId(userId);
         if (announcement == null) {
             throw new IllegalArgumentException("Announcement not found with id: " + id);
         }
 
-        if (announcement.getCreator().getId() != userId) {
-            throw new IllegalArgumentException("You are not authorized to delete this announcement.");
+        //todo: Usunąć poniższe alternatywy kiedy zdecydujemy się na konkretną formę Admina
+        boolean isAdmin = userRoles.stream()
+                .anyMatch(role -> "Admin".equals(role.getName()) || "ROLE_ADMIN".equals(role.getName()) || "ADMIN".equals(role.getName()));
+
+        if (!isAdmin) {
+            throw new IllegalArgumentException("You are not authorized to edit this announcement.");
         }
 
         announcementRepo.delete(announcement);
