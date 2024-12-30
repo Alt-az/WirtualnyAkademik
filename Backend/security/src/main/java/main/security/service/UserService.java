@@ -122,4 +122,7 @@ public class UserService {
         return true;
     }
 
+    public User getUserByName(String username){
+        return userRepo.findByUsername(username);
+    }
 }
