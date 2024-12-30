@@ -106,22 +106,22 @@ const AdminPanel = () => {
             />
             <h1 className="text-2xl font-bold mb-4">Panel Administratora - Użytkownicy</h1>
             {error && <div className="text-red-600 mb-4">{error}</div>}
-            <table className="table-auto w-full border-collapse border border-gray-300 text-sm">
+            <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
                 <thead>
-                <tr>
-                    <th className="border border-gray-300 px-2 py-1">ID</th>
-                    <th className="border border-gray-300 px-2 py-1">Nazwa użytkownika</th>
-                    <th className="border border-gray-300 px-2 py-1">Email</th>
-                    <th className="border border-gray-300 px-2 py-1">Aktywowany</th>
+                <tr className="bg-gray-100 border-b">
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">ID</th>
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Nazwa użytkownika</th>
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Email</th>
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Aktywowany</th>
                 </tr>
                 </thead>
                 <tbody>
                 {filteredUsers.map((user) => (
-                    <tr key={user.id}>
-                        <td className="border border-gray-300 px-2 py-1">{user.id}</td>
-                        <td className="border border-gray-300 px-2 py-1">{user.username}</td>
-                        <td className="border border-gray-300 px-2 py-1">{user.email}</td>
-                        <td className="border border-gray-300 px-2 py-1">
+                    <tr key={user.id} className="border-b hover:bg-gray-50">
+                        <td className="py-3 px-4 text-sm text-gray-700">{user.id}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700">{user.username}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700">{user.email}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700">
                             {user.isActivated ? 'Tak' : 'Nie'}
                         </td>
                     </tr>
