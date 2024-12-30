@@ -36,6 +36,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserLaundry> userLaundries = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Delivery> deliveries = new ArrayList<>();
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    // private List<Delivery> deliveries = new ArrayList<>();
 }

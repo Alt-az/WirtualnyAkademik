@@ -34,7 +34,7 @@ const AnnouncementsPage = () => {
   const handleSaveEdit = () => {
     if (editAnnouncement) {
       AnnouncementService.togglePinAnnouncement(editAnnouncement, editAnnouncement.pinned).then(() => {
-        setAnnouncements(announcements.map(a => a.id === editAnnouncement.id ? editAnnouncement : a));
+        setAnnouncements(announcements?.map(a => a.id === editAnnouncement.id ? editAnnouncement : a));
         handleCloseEditModal();
       }).catch(console.error);
     }
@@ -42,7 +42,7 @@ const AnnouncementsPage = () => {
   const handleDelete = (id: number) => {
     if (window.confirm("Czy na pewno chcesz usunąć to ogłoszenie?")) {
       AnnouncementService.deleteAnnouncement(id).then(() => {
-        setAnnouncements(announcements.filter(a => a.id !== id));
+        setAnnouncements(announcements?.filter(a => a.id !== id));
       }).catch(console.error);
     }
   };
@@ -50,7 +50,7 @@ const AnnouncementsPage = () => {
     const announcement = announcements.find(a => a.id === id);
     if (announcement) {
       AnnouncementService.togglePinAnnouncement(announcement, !announcement.pinned).then(() => {
-        setAnnouncements(announcements.map(a => a.id === id ? { ...a, pinned: !a.pinned } : a));
+        setAnnouncements(announcements?.map(a => a.id === id ? { ...a, pinned: !a.pinned } : a));
       }).catch(console.error);
     }
   };
@@ -59,7 +59,7 @@ const AnnouncementsPage = () => {
   return (
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Tablica ogłoszeń</h1>
-        {announcements.length === 0 && <p>Brak ogłoszeń</p>}
+        {announcements?.length === 0 && <p>Brak ogłoszeń</p>}
 
         <TransitionGroup className="space-y-4">
           {announcements?.map(announcement => (
