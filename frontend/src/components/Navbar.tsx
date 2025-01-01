@@ -63,13 +63,13 @@ const Navbar = () => {
                 <>
                   <a
                       onClick={() => navigate("/login")}
-                      className="hover:underline cursor-pointer transition duration-200 text-gray-300"
+                      className="text-gray-300 hover:text-white transition duration-200 font-medium cursor-pointer flex items-center space-x-2"
                   >
                     Zaloguj
                   </a>
                   <a
                       onClick={() => navigate("/register")}
-                      className="hover:underline cursor-pointer transition duration-200 text-gray-300"
+                      className="text-gray-300 hover:text-white transition duration-200 font-medium cursor-pointer flex items-center space-x-2"
                   >
                     Rejestracja
                   </a>

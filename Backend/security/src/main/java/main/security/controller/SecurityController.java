@@ -82,7 +82,7 @@ public class SecurityController {
         System.out.println("login");
         if(service.existsByUsername(this.userDetailsService.loadUserByUsername(user.getUsername()).getUsername()))
         {
-            if(service.getSettings(user.getUsername()).getIsActivated() == false)
+            if(!service.getSettings(user.getUsername()).isActivated())
             {
                 Map<String, String> response = new HashMap<>();
                 System.out.println("test");
