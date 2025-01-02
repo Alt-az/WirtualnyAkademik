@@ -32,7 +32,7 @@ public class SecurityConfig {
         return http.csrf(customizer -> customizer.disable()).
                 authorizeHttpRequests(request -> request
                         .requestMatchers("/admin-panel").hasRole("ADMIN")
-                        .requestMatchers("security/login", "/security/register","/email/validate", "/announcement/show/**").permitAll()
+                        .requestMatchers("security/login", "/security/register","/email/validate", "/announcement/show/**","/laundry/**").permitAll()
 
                         .requestMatchers("/announcements").hasRole("USER")
                         .anyRequest().authenticated()).

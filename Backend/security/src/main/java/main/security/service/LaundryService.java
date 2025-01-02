@@ -2,7 +2,9 @@ package main.security.service;
 
 import jakarta.persistence.Access;
 import main.security.model.Laundry;
+import main.security.model.UserLaundry;
 import main.security.repo.LaundryRepo;
+import main.security.repo.UserLaundryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +16,12 @@ public class LaundryService {
 
     LaundryRepo laundryRepo;
 
+    UserLaundryRepo userLaundryRepo;
+
     @Autowired
-    public LaundryService(LaundryRepo laundryRepo) {
+    public LaundryService(LaundryRepo laundryRepo, UserLaundryRepo userLaundryRepo) {
         this.laundryRepo = laundryRepo;
+        this.userLaundryRepo = userLaundryRepo;
     }
 
     public void addLaundry(Laundry laundry) {
@@ -32,5 +37,13 @@ public class LaundryService {
     }
     public List<Laundry> getLaundriesByMonth(int month, int year) {
         return laundryRepo.findByMonthAndYear(month, year);
+    }
+
+    public void addUserLaundry(UserLaundry userLaundry) {
+        userLaundryRepo.save(userLaundry);
+    }
+
+    public Laundry getLaundryByStartTime(LocalDateTime dateTime) {
+        return laundryRepo.findByStartTime(dateTime);
     }
 }
