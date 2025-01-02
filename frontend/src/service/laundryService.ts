@@ -1,4 +1,6 @@
 import axiosInstance from './axiosInstance';
+import axios from "axios";
+import { getConfig } from "./utils.ts";
 
 export const getLaundrySlots = async (month: string, year: string) => {
     const response = await axiosInstance.get('/laundry/laundry-slots',{
@@ -27,3 +29,33 @@ export const updateLaundrySlot = async (dateKey: string, slot: any) => {
     });
     return response.data;
 };
+
+export const getUserLaundries = async () => {
+    try {
+        const config = getConfig();
+        const endpoint = `http://localhost:8082/laundry/user-laundries`;
+
+        const response = await axios.get(endpoint, config);
+
+        return Array.isArray(response.data) ? response.data : [];
+    } catch (error) {
+        console.error('Error fetching user laundries:', error.response || error.message);
+        return [];
+    }
+};
+
+
+export const deleteLaundryReservation = async (laundryId) => {
+    try {
+        const config = getConfig();
+        const response = await axios.delete(`http://localhost:8082/laundry/cancelReservation?id=${laundryId}`, config);
+        console.log('Usunięto rezerwację:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Błąd podczas usuwania rezerwacji:', error.response || error.message);
+        throw error;
+    }
+};
+
+
+
