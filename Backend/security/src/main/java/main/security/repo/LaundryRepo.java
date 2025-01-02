@@ -17,4 +17,6 @@ public interface LaundryRepo extends JpaRepository<Laundry, Integer> {
     public Laundry findById(Long id);
     @Query("SELECT l FROM Laundry l WHERE MONTH(l.startTime) = :month AND YEAR(l.startTime) = :year")
     List<Laundry> findByMonthAndYear(@Param("month") int month, @Param("year") int year);
+
+    void deleteById(Long id);
 }

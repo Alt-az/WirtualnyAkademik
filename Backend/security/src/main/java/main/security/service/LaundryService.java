@@ -7,6 +7,7 @@ import main.security.repo.LaundryRepo;
 import main.security.repo.UserLaundryRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,4 +47,28 @@ public class LaundryService {
     public Laundry getLaundryByStartTime(LocalDateTime dateTime) {
         return laundryRepo.findByStartTime(dateTime);
     }
+
+    public List<UserLaundry> getLaundryForUser(int userId){
+        return userLaundryRepo.findByUser_Id(userId);
+    }
+
+    @Transactional
+    public boolean deleteUserLaundry(int userId, Long laundryId) {
+        UserLaundry userLaundry = userLaundryRepo.findById(laundryId)
+                .orElseThrow(() -> new RuntimeException("Reservation not found"));
+
+
+        if (userId != userLaundry.getUser().getId()) {
+            return false;
+        }
+
+        Laundry laundry = userLaundry.getLaundry();
+        Long laId = laundry.getId();
+
+        laundryRepo.deleteById(laId);
+        userLaundryRepo.deleteById(laundryId);
+
+        return true;
+    }
+
 }
