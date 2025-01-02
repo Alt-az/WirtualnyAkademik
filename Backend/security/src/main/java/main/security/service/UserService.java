@@ -2,8 +2,10 @@ package main.security.service;
 
 
 import main.security.model.User;
+import main.security.model.UserRole;
 import main.security.model.ValidationCode;
 import main.security.repo.UserRepo;
+import main.security.repo.UserRoleRepo;
 import main.security.repo.ValidationCodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +23,8 @@ import java.util.List;
 
 @Service
 public class UserService {
+    @Autowired
+    private UserRoleRepo userRoleRepo;
 
     @Autowired
     private CaptchaService captchaService;
@@ -118,8 +122,20 @@ public class UserService {
 
     public boolean deleteUser(int id)
     {
-        userRepo.deleteById(id);
+        User user = userRepo.findById(id);
+        validationCodeService.deleteValidationCodeByUser(user);
         return true;
     }
-
+    public boolean editUser(User user){
+        User u = userRepo.findByUsername(user.getUsername());
+        u.setName(user.getName());
+        for(UserRole us:user.getRoles())
+        {
+            UserRole temp = userRoleRepo.findByName(us.getName());
+            if(temp!=null)
+                u.addRole(temp);
+        }
+        userRepo.save(u);
+        return true;
+    }
 }

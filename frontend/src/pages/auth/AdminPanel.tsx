@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AdminService from '../../service/admin.service.ts';
 import { IAnnouncement } from "../../model/IAnnouncement.ts";
+import { API_URL } from "../../../const.ts";
 import AnnouncementService from "../../service/announcement.service.ts";
 import { MdDelete, MdEdit, MdPushPin } from "react-icons/md";
 
@@ -18,6 +19,12 @@ const AdminPanel = () => {
     const [editAnnouncement, setEditAnnouncement] = useState<IAnnouncement | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredUsers, setFilteredUsers] = useState([]);
+    const [roles, setRoles] = useState<string[]>([]);
+    const [newRole, setNewRole] = useState('');
+    const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+    const [editUser, setEditUser] = useState(null);
+    const [availableRoles, setAvailableRoles] = useState<string[]>([]);
+
     useEffect(() => {
         if (selectedSection === 'announcements') {
             AnnouncementService.findAllAnnouncements(currentPage)
@@ -27,6 +34,10 @@ const AdminPanel = () => {
                     setAnnouncements(data.announcements);
                 })
                 .catch(console.error);
+        }
+        if (selectedSection === 'permissions')
+        {
+            fetchRoles();
         }
     }, [currentPage, selectedSection]);
 
@@ -54,9 +65,66 @@ const AdminPanel = () => {
         );
         setFilteredUsers(filtered);
     };
+    const handleDeleteUser = (id: number) =>{
+        if(window.confirm("Czy na pewno chcesz usunąć trwale konto tego użytkownika?")) {
+            const token = localStorage.getItem('token');
+            AdminService.deleteUser(id,token || '').then(() => {
+                setFilteredUsers(users.filter(a => a.id !== id));
+            }).catch(console.error);
+        }
+    }
+    const handleEditUser = async (user) => {
+        setEditUser(user);
+        try {
+            await fetchRoles();
+            setAvailableRoles(roles.filter((role) => !user.roles.includes(role)));
+        } catch (error) {
+            console.error('Błąd podczas pobierania ról:', error);
+        }
+        setIsEditUserModalOpen(true);
+    };
+    const handleSaveUserEdit = async () => {
+        try {
+            const token = localStorage.getItem('token');
+
+            // Tworzymy obiekt z danymi użytkownika, które chcemy wysłać
+            const updatedUser = {
+                id: editUser.id, // ID użytkownika
+                username: editUser.username,
+                email: editUser.email,
+                roles: editUser.roles, // role użytkownika
+                // Możesz dodać inne pola z `editUser`, jeśli backend tego wymaga
+            };
+
+            // Wysyłamy zapytanie do backendu
+            console.log('Token:', token);
+            await fetch(`${API_URL}/user/edit-user?user-id=${editUser.id}`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedUser),
+            });
+
+            setIsEditUserModalOpen(false);
+            await fetchUsers();
+
+        } catch (error) {
+            console.error('Błąd podczas zapisywania zmian użytkownika:', error);
+        }
+    };
+    const toggleUserRole = (role: string) => {
+        const hasRole = editUser.roles.includes(role);
+        setEditUser({
+            ...editUser,
+            roles: hasRole
+                ? editUser.roles.filter((r) => r !== role)
+                : [...editUser.roles, role],
+        });
+    };
     const nextPage = () => setOffset((prev) => prev + pageSize);
     const prevPage = () => setOffset((prev) => Math.max(0, prev - pageSize));
-
     const handleDelete = (id: number) => {
         if (window.confirm("Czy na pewno chcesz usunąć to ogłoszenie?")) {
             AnnouncementService.deleteAnnouncement(id).then(() => {
@@ -94,7 +162,55 @@ const AdminPanel = () => {
         setIsEditModalOpen(false);
         setEditAnnouncement(null);
     };
-
+    const fetchRoles = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${API_URL}/role/get`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+            const data = await response.json();
+            setRoles(data.map((role: { name: string }) => role.name));  // zakładając, że odpowiedź to lista obiektów z rolą
+        } catch (error) {
+            console.error('Błąd podczas pobierania ról:', error);
+        }
+    };
+    const handleDeleteRole = async (role: string) => {
+        if (window.confirm(`Czy na pewno chcesz usunąć rolę "${role}"?`)) {
+            const token = localStorage.getItem('token');
+            try {
+                await fetch(`${API_URL}/role/delete?role=${role}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                setRoles(roles.filter((r) => r !== role));
+            } catch (error) {
+                console.error('Błąd podczas usuwania roli:', error);
+            }
+        }
+    };
+    const handleAddRole = async () => {
+        if (newRole) {
+            const token = localStorage.getItem('token');
+            try {
+                await fetch(`${API_URL}/role/add?role=${newRole}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                setNewRole('');  // Czyści pole po udanym dodaniu roli
+                fetchRoles();  // Ponownie pobiera listę ról
+            } catch (error) {
+                console.error('Błąd podczas dodawania roli:', error);
+            }
+        }
+    };
     const renderUsers = () => (
         <>
             <input
@@ -106,28 +222,44 @@ const AdminPanel = () => {
             />
             <h1 className="text-2xl font-bold mb-4">Panel Administratora - Użytkownicy</h1>
             {error && <div className="text-red-600 mb-4">{error}</div>}
-            <table className="table-auto w-full border-collapse border border-gray-300 text-sm">
+            <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
                 <thead>
-                <tr>
-                    <th className="border border-gray-300 px-2 py-1">ID</th>
-                    <th className="border border-gray-300 px-2 py-1">Nazwa użytkownika</th>
-                    <th className="border border-gray-300 px-2 py-1">Email</th>
-                    <th className="border border-gray-300 px-2 py-1">Aktywowany</th>
+                <tr className="bg-gray-100 border-b">
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">ID</th>
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Nazwa użytkownika</th>
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Email</th>
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Aktywowany</th>
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Akcje</th>
                 </tr>
                 </thead>
                 <tbody>
                 {filteredUsers.map((user) => (
-                    <tr key={user.id}>
-                        <td className="border border-gray-300 px-2 py-1">{user.id}</td>
-                        <td className="border border-gray-300 px-2 py-1">{user.username}</td>
-                        <td className="border border-gray-300 px-2 py-1">{user.email}</td>
-                        <td className="border border-gray-300 px-2 py-1">
+                    <tr key={user.id} className="border-b hover:bg-gray-50">
+                        <td className="py-3 px-4 text-sm text-gray-700">{user.id}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700">{user.username}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700">{user.email}</td>
+                        <td className="py-3 px-4 text-sm text-gray-700">
                             {user.isActivated ? 'Tak' : 'Nie'}
+                        </td>
+                        <td className="py-3 px-4 text-sm text-gray-700 space-x-2">
+                            <button
+                                onClick={() => handleEditUser(user)}
+                                className="px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                            >
+                                Edytuj
+                            </button>
+                            <button
+                                onClick={() => handleDeleteUser(user.id)}
+                                className="px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200"
+                            >
+                                Usuń
+                            </button>
                         </td>
                     </tr>
                 ))}
                 </tbody>
             </table>
+
 
             <div className="mt-4 flex justify-between">
                 <button
@@ -225,7 +357,44 @@ const AdminPanel = () => {
             </>
         );
     };
+    const renderPermissions = () => (
+        <div className="flex">
+            {/* Lewa strona: lista ról */}
+            <div className="w-1/3 p-4 bg-gray-100">
+                <h3 className="text-lg font-semibold mb-4">Role</h3>
+                <ul>
+                    {roles.map((role, index) => (
+                        <li key={index} className="mb-2 flex justify-between items-center">
+                            <span>{role}</span>
+                            <button
+                                onClick={() => handleDeleteRole(role)}
+                                className="text-red-500 hover:text-red-700 transition duration-200"
+                            >
+                                Usuń
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            </div>
 
+            <div className="w-2/3 p-4">
+                <h3 className="text-lg font-semibold mb-4">Dodaj rolę</h3>
+                <input
+                    type="text"
+                    value={newRole}
+                    onChange={(e) => setNewRole(e.target.value)}
+                    className="mb-4 p-2 border rounded w-full"
+                    placeholder="Nowa rola"
+                />
+                <button
+                    onClick={handleAddRole}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                    Dodaj rolę
+                </button>
+            </div>
+        </div>
+    );
 
     return (
         <div className="flex flex-col  overflow-hidden">
@@ -247,10 +416,76 @@ const AdminPanel = () => {
                         >
                             Zarządzaj ogłoszeniami
                         </button>
+                        <button
+                            className={`block w-fit text-left px-4 py-2 rounded ${selectedSection === 'permissions' ? 'bg-gray-300' : ''}`}
+                            onClick={() => setSelectedSection('permissions')}
+                        >
+                            Zarządzaj uprawnieniami
+                        </button>
                     </div>
                 </aside>
                 <main className="flex-grow p-4 overflow-hidden">
-                    {selectedSection === 'users' ? renderUsers() : renderAnnouncements()}
+                    {selectedSection === 'permissions' ? renderPermissions() : selectedSection === 'users' ? renderUsers() : renderAnnouncements()}
+                    {isEditUserModalOpen && editUser && (
+                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                            <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+                                <h2 className="text-xl font-bold mb-4">Edytuj Użytkownika</h2>
+                                <p className="mb-4">Nazwa użytkownika: {editUser.username}</p>
+                                <div className="flex">
+                                    {/* Role użytkownika */}
+                                    <div className="w-1/2 p-4 border-r">
+                                        <h3 className="font-semibold mb-2">Role użytkownika:</h3>
+                                        <ul>
+                                            {editUser.roles.map((role) => (
+                                                <li key={role} className="flex justify-between items-center">
+                                                    <span>{role}</span>
+                                                    <button
+                                                        onClick={() => toggleUserRole(role)}
+                                                        className="text-red-500 hover:text-red-700"
+                                                    >
+                                                        Usuń
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    {/* Dostępne role */}
+                                    <div className="w-1/2 p-4">
+                                        <h3 className="font-semibold mb-2">Dostępne role:</h3>
+                                        <ul>
+                                            {availableRoles
+                                                .filter((role) => !editUser.roles.includes(role))
+                                                .map((role) => (
+                                                    <li key={role} className="flex justify-between items-center">
+                                                        <span>{role}</span>
+                                                        <button
+                                                            onClick={() => toggleUserRole(role)}
+                                                            className="text-green-500 hover:text-green-700"
+                                                        >
+                                                            Dodaj
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div className="flex justify-end space-x-2 mt-4">
+                                    <button
+                                        onClick={() => setIsEditUserModalOpen(false)}
+                                        className="text-gray-500 hover:text-gray-700"
+                                    >
+                                        Anuluj
+                                    </button>
+                                    <button
+                                        onClick={handleSaveUserEdit}
+                                        className="text-blue-500 hover:text-blue-700"
+                                    >
+                                        Zapisz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     {isEditModalOpen && editAnnouncement && (
                         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                             <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">

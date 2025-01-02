@@ -4,6 +4,7 @@ import main.security.model.UserRole;
 import main.security.repo.UserRepo;
 import main.security.repo.UserRoleRepo;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,12 +15,12 @@ public class UserRoleService {
     public UserRoleService(UserRoleRepo userRoleRepo) {
         this.userRoleRepo = userRoleRepo;
     }
-
+    @Transactional
     public void addUserRole(String name) {
         UserRole userRole = new UserRole(name);
         userRoleRepo.save(userRole);
     }
-
+    @Transactional
     public void deleteUserRole(String name) {
         userRoleRepo.deleteByName(name);
     }

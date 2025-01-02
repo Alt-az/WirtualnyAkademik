@@ -42,7 +42,6 @@ public class AnnouncementService {
             throw new IllegalArgumentException("Announcement not found with id: " + id);
         }
 
-
         //todo: Usunąć poniższe alternatywy kiedy zdecydujemy się na konkretną formę Admina
         boolean isAdmin = userRoles.stream()
                 .anyMatch(role -> "Admin".equals(role.getName()) || "ROLE_ADMIN".equals(role.getName()) || "ADMIN".equals(role.getName()));
