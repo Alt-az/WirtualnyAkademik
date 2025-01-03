@@ -1,5 +1,6 @@
 package main.security.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -24,6 +25,70 @@ public class User {
     private String username;
     private String password;
     private boolean isActivated;
+    public boolean getIsActivated() {
+        return isActivated;
+    }
+
+    public void setIsActivated(boolean activated) {
+        isActivated = activated;
+    }
+
+    public Set<UserRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<UserRole> roles) {
+        this.roles = roles;
+    }
+
+    public Set<UserLaundry> getUserLaundries() {
+        return userLaundries;
+    }
+
+    public void setUserLaundries(Set<UserLaundry> userLaundries) {
+        this.userLaundries = userLaundries;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

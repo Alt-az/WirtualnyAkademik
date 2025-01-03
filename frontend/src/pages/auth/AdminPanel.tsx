@@ -55,7 +55,9 @@ const AdminPanel = () => {
     };
 
     useEffect(() => {
-        if (selectedSection === 'users') fetchUsers();
+        if (selectedSection === 'users')
+            fetchUsers();
+            console.log(users);
     }, [offset, selectedSection]);
 
     const handleSearch = (term) => {
@@ -360,6 +362,7 @@ const AdminPanel = () => {
     const renderPermissions = () => (
         <div className="flex">
             {/* Lewa strona: lista ról */}
+
             <div className="w-1/3 p-4 bg-gray-100">
                 <h3 className="text-lg font-semibold mb-4">Role</h3>
                 <ul>
@@ -436,9 +439,10 @@ const AdminPanel = () => {
                                     <div className="w-1/2 p-4 border-r">
                                         <h3 className="font-semibold mb-2">Role użytkownika:</h3>
                                         <ul>
-                                            {editUser.roles.map((role) => (
-                                                <li key={role} className="flex justify-between items-center">
-                                                    <span>{role}</span>
+                                            {
+                                                editUser.roles.map((role) => (
+                                                    <li key={role.id} className="flex justify-between items-center">
+                                                        <span>{role.name}</span> {/* Wyświetl nazwę roli */}
                                                     <button
                                                         onClick={() => toggleUserRole(role)}
                                                         className="text-red-500 hover:text-red-700"
@@ -454,7 +458,7 @@ const AdminPanel = () => {
                                         <h3 className="font-semibold mb-2">Dostępne role:</h3>
                                         <ul>
                                             {availableRoles
-                                                .filter((role) => !editUser.roles.includes(role))
+                                                .filter((role) => !editUser.roles.some((r) => r.name === role))
                                                 .map((role) => (
                                                     <li key={role} className="flex justify-between items-center">
                                                         <span>{role}</span>
