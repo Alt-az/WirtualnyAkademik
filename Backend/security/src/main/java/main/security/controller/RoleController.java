@@ -24,8 +24,9 @@ public class RoleController {
     return ResponseEntity.ok("Role added");
     }
 
-    @GetMapping("/delete")
+    @PostMapping("/delete")
     public ResponseEntity<String> deleteRole(@RequestParam("role") String role) {
+
         userRoleService.deleteUserRole(role);
         return ResponseEntity.ok("Role removed");
     }
