@@ -76,30 +76,32 @@ const AdminPanel = () => {
         }
     }
     const handleEditUser = async (user) => {
-        setEditUser(user);
+        setEditUser(user); // Ustaw użytkownika do edycji
+
         try {
-            await fetchRoles();
-            setAvailableRoles(roles.filter((role) => !user.roles.includes(role)));
+            await fetchRoles(); // Pobierz wszystkie role z API
+
+            // Filtrowanie dostępnych ról
+            const available = roles.filter(
+                (role) => !user.roles.some((r) => r === role) // Porównanie ról po nazwie
+            );
+
+            setAvailableRoles(available); // Ustaw dostępne role w stanie
         } catch (error) {
             console.error('Błąd podczas pobierania ról:', error);
         }
-        setIsEditUserModalOpen(true);
+        setIsEditUserModalOpen(true); // Otwórz modal
     };
     const handleSaveUserEdit = async () => {
         try {
             const token = localStorage.getItem('token');
 
-            // Tworzymy obiekt z danymi użytkownika, które chcemy wysłać
             const updatedUser = {
                 id: editUser.id, // ID użytkownika
                 username: editUser.username,
                 email: editUser.email,
                 roles: editUser.roles, // role użytkownika
-                // Możesz dodać inne pola z `editUser`, jeśli backend tego wymaga
             };
-
-            // Wysyłamy zapytanie do backendu
-            console.log('Token:', token);
             await fetch(`${API_URL}/user/edit-user?user-id=${editUser.id}`, {
                 method: 'POST',
                 headers: {
@@ -117,13 +119,24 @@ const AdminPanel = () => {
         }
     };
     const toggleUserRole = (role: string) => {
-        const hasRole = editUser.roles.includes(role);
-        setEditUser({
-            ...editUser,
-            roles: hasRole
-                ? editUser.roles.filter((r) => r !== role)
-                : [...editUser.roles, role],
-        });
+        const hasRole = editUser.roles.some((r) => r.name === role);
+
+        if (hasRole) {
+            // Usuń rolę z użytkownika i dodaj ją z powrotem do dostępnych
+            setEditUser({
+                ...editUser,
+                roles: editUser.roles.filter((r) => r.name !== role),
+            });
+            setAvailableRoles((prevRoles) => [...prevRoles, role]);
+        } else {
+            // Dodaj rolę do użytkownika i usuń ją z dostępnych
+            const newRole = { id: Date.now(), name: role }; // Tymczasowe ID
+            setEditUser({
+                ...editUser,
+                roles: [...editUser.roles, newRole],
+            });
+            setAvailableRoles((prevRoles) => prevRoles.filter((r) => r !== role));
+        }
     };
     const nextPage = () => setOffset((prev) => prev + pageSize);
     const prevPage = () => setOffset((prev) => Math.max(0, prev - pageSize));
@@ -439,12 +452,11 @@ const AdminPanel = () => {
                                     <div className="w-1/2 p-4 border-r">
                                         <h3 className="font-semibold mb-2">Role użytkownika:</h3>
                                         <ul>
-                                            {
-                                                editUser.roles.map((role) => (
-                                                    <li key={role.id} className="flex justify-between items-center">
-                                                        <span>{role.name}</span> {/* Wyświetl nazwę roli */}
+                                            {editUser.roles.map((role) => (
+                                                <li key={role.id} className="flex justify-between items-center">
+                                                    <span>{role.name}</span> {/* Wyświetl nazwę roli */}
                                                     <button
-                                                        onClick={() => toggleUserRole(role)}
+                                                        onClick={() => toggleUserRole(role.name)}
                                                         className="text-red-500 hover:text-red-700"
                                                     >
                                                         Usuń
@@ -458,7 +470,7 @@ const AdminPanel = () => {
                                         <h3 className="font-semibold mb-2">Dostępne role:</h3>
                                         <ul>
                                             {availableRoles
-                                                .filter((role) => !editUser.roles.some((r) => r.name === role))
+                                                .filter((role) => !editUser.roles.some((r) => r.name === role)) // Filtrujemy role
                                                 .map((role) => (
                                                     <li key={role} className="flex justify-between items-center">
                                                         <span>{role}</span>
