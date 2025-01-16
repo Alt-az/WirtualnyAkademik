@@ -31,4 +31,7 @@ public class UserRoleService {
     public List<UserRole> getAllRoles() {
         return userRoleRepo.findAll();
     }
+
+    public List<UserRole> getUserRoles(int userId) {
+        return userRoleRepo.findByUserId(userId);}
 }
