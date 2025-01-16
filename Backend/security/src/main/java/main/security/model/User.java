@@ -28,7 +28,6 @@ public class User {
     public boolean getIsActivated() {
         return isActivated;
     }
-
     public void setIsActivated(boolean activated) {
         isActivated = activated;
     }
@@ -104,6 +103,4 @@ public class User {
     public boolean addRole(UserRole role) {
         return roles.add(role);
     }
-    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private List<Delivery> deliveries = new ArrayList<>();
 }

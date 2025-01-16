@@ -10,6 +10,7 @@ import AdminPanel from "./pages/auth/AdminPanel.tsx";
 import AddAnnouncementPage from './pages/auth/AddAnnouncementPage';
 import AnnoucementsPage from "./pages/announcement/AnnoucementsPage.tsx";
 import LaundryTimetablePage from "./pages/laundry/LaundryTimetablePage.tsx";
+import PackagePickupPage from "./pages/package/PackagePickUp.tsx";
 import LandingPage from "./pages/LandingPage.tsx";
 
 const router = createBrowserRouter(
@@ -23,6 +24,7 @@ const router = createBrowserRouter(
           <Route path="/announcements" element={<AnnoucementsPage />} />
           <Route path="/announcements/add" element={<AddAnnouncementPage />} />
           <Route path="/laundry-timetable" element={<LaundryTimetablePage/>}/>
+            <Route path="/package-pickup" element={<PackagePickupPage/>}/>
           <Route path="/admin-panel" element={<AdminPanel/>}/>
         </Route>,
     ),
