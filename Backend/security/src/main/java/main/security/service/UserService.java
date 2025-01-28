@@ -81,7 +81,7 @@ public class UserService {
         if(!validationCode.isActivated() && !validationCodeService.isCodeExpired(validationCode)){
             User user = validationCode.getUser();
             System.out.println(user);
-            user.setActivated(true);
+            user.setIsActivated(true);
             userRepo.save(user);
             validationCode.setActivated(true);
             validationCodeService.save(validationCode);
@@ -141,4 +141,5 @@ public class UserService {
     public User getUserByName(String username){
         return userRepo.findByUsername(username);
     }
+
 }

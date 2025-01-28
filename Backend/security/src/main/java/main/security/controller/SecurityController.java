@@ -3,10 +3,8 @@ package main.security.controller;
 import jakarta.mail.MessagingException;
 import main.security.model.UserRegistrationRequest;
 import main.security.model.User;
-import main.security.service.EmailService;
-import main.security.service.MyUserDetailsService;
-import main.security.service.UserService;
-import main.security.service.ValidationCodeService;
+import main.security.model.UserRole;
+import main.security.service.*;
 import main.security.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +15,7 @@ import org.springframework.validation.DataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -34,14 +33,20 @@ public class SecurityController {
 
     private final UserValidator validator;
 
+    private final UserRoleService userRoleService;
+
+    private final UserService userService;
+
 
     @Autowired
-    public SecurityController(UserService service, ValidationCodeService validationCodeService, EmailService emailService, MyUserDetailsService userDetailsService, UserValidator validator) {
+    public SecurityController(UserService userService, UserRoleService userRoleService, UserService service, ValidationCodeService validationCodeService, EmailService emailService, MyUserDetailsService userDetailsService, UserValidator validator) {
         this.service = service;
         this.validationCodeService = validationCodeService;
         this.emailService = emailService;
         this.userDetailsService = userDetailsService;
         this.validator = validator;
+        this.userRoleService = userRoleService;
+        this.userService = userService;
     }
 
     //@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -82,7 +87,7 @@ public class SecurityController {
         System.out.println("login");
         if(service.existsByUsername(this.userDetailsService.loadUserByUsername(user.getUsername()).getUsername()))
         {
-            if(!service.getSettings(user.getUsername()).isActivated())
+            if(!service.getSettings(user.getUsername()).getIsActivated())
             {
                 Map<String, String> response = new HashMap<>();
                 System.out.println("test");
@@ -117,6 +122,21 @@ public class SecurityController {
             // Token niepoprawny, zwróć błąd
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
         }
+    }
+
+    @GetMapping("/get-roles")
+    public ResponseEntity<List<String>> getRoles(@RequestHeader("Authorization") String token){
+        String jwt = token.substring(7);
+        String username = service.extractUserName(jwt);
+        User user  = userService.getUserByName(username);
+        List<UserRole> userRoles = userRoleService.getUserRoles(user.getId());
+        List<String> roleNames = userRoles.stream()
+                .map(UserRole::getName)
+                .toList();
+
+        System.out.println("Role użytkownika: " + roleNames);
+
+        return ResponseEntity.ok(roleNames);
     }
 
 }

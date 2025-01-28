@@ -1,31 +1,97 @@
 import React, { useEffect, useState } from 'react';
-import AdminService from '../../service/admin.service.ts';
-import { IAnnouncement } from "../../model/IAnnouncement.ts";
-import { API_URL } from "../../../const.ts";
-import AnnouncementService from "../../service/announcement.service.ts";
+import AdminService from '../../service/admin.service';
+import { IAnnouncement } from "../../model/IAnnouncement";
+import { API_URL } from "../../../const";
+import AnnouncementService from "../../service/announcement.service";
 import { MdDelete, MdEdit, MdPushPin } from "react-icons/md";
 
-const AdminPanel = () => {
-    const [users, setUsers] = useState([]);
+
+const fetchRolesFromApi = async (token: string): Promise<string[]> => {
+    const response = await fetch(`http://localhost:8082/security/get-roles`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Błąd HTTP: ${response.status}`);
+    }
+
+    return await response.json();
+};
+
+interface IRole {
+    id: number;
+    name: string;
+}
+
+interface IUser {
+    id: number;
+    username: string;
+    email: string;
+    isActivated: boolean;
+    roles: IRole[];
+}
+
+const AdminPanel: React.FC = () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [hasAccess, setHasAccess] = useState(false);
+
+    const [users, setUsers] = useState<IUser[]>([]);
     const [error, setError] = useState('');
     const [pageSize] = useState(10);
     const [offset, setOffset] = useState(0);
     const [field] = useState('id');
+
     const [announcements, setAnnouncements] = useState<IAnnouncement[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [selectedSection, setSelectedSection] = useState('users');
+
+    const [selectedSection, setSelectedSection] = useState<'users' | 'announcements' | 'permissions'>('users');
+
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editAnnouncement, setEditAnnouncement] = useState<IAnnouncement | null>(null);
+
     const [searchTerm, setSearchTerm] = useState('');
-    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [filteredUsers, setFilteredUsers] = useState<IUser[]>([]);
+
     const [roles, setRoles] = useState<string[]>([]);
     const [newRole, setNewRole] = useState('');
+
     const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
-    const [editUser, setEditUser] = useState(null);
+    const [editUser, setEditUser] = useState<IUser | null>(null); // user do edycji
     const [availableRoles, setAvailableRoles] = useState<string[]>([]);
 
+
     useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setHasAccess(false);
+            setIsLoading(false);
+            return;
+        }
+
+        fetchRolesFromApi(token)
+            .then((fetchedRoles) => {
+                if (fetchedRoles.includes("ROLE_ADMIN")) {
+                    setHasAccess(true);
+                } else {
+                    setHasAccess(false);
+                }
+            })
+            .catch((err) => {
+                console.error("Błąd przy pobieraniu ról:", err);
+                setHasAccess(false);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
+    }, []);
+
+    useEffect(() => {
+        if (!hasAccess) return;
+
         if (selectedSection === 'announcements') {
             AnnouncementService.findAllAnnouncements(currentPage)
                 .then(response => {
@@ -35,11 +101,11 @@ const AdminPanel = () => {
                 })
                 .catch(console.error);
         }
-        if (selectedSection === 'permissions')
-        {
+
+        if (selectedSection === 'permissions') {
             fetchRoles();
         }
-    }, [currentPage, selectedSection]);
+    }, [hasAccess, currentPage, selectedSection]);
 
     const fetchUsers = async () => {
         try {
@@ -54,58 +120,62 @@ const AdminPanel = () => {
         }
     };
 
-    useEffect(() => {
-        if (selectedSection === 'users')
-            fetchUsers();
-            console.log(users);
-    }, [offset, selectedSection]);
 
-    const handleSearch = (term) => {
+    useEffect(() => {
+        if (!hasAccess) return;
+        if (selectedSection === 'users') {
+            fetchUsers();
+        }
+    }, [hasAccess, offset, selectedSection]);
+
+    const handleSearch = (term: string) => {
         setSearchTerm(term);
         const filtered = users.filter((user) =>
             user.username.toLowerCase().includes(term.toLowerCase())
         );
         setFilteredUsers(filtered);
     };
-    const handleDeleteUser = (id: number) =>{
-        if(window.confirm("Czy na pewno chcesz usunąć trwale konto tego użytkownika?")) {
+
+    const handleDeleteUser = (id: number) => {
+        if (window.confirm("Czy na pewno chcesz usunąć trwale konto tego użytkownika?")) {
             const token = localStorage.getItem('token');
-            AdminService.deleteUser(id,token || '').then(() => {
-                setFilteredUsers(users.filter(a => a.id !== id));
-            }).catch(console.error);
+            AdminService.deleteUser(id, token || '')
+                .then(() => {
+                    setFilteredUsers((prev) => prev.filter(u => u.id !== id));
+                })
+                .catch(console.error);
         }
-    }
-    const handleEditUser = async (user) => {
-        setEditUser(user); // Ustaw użytkownika do edycji
+    };
+
+    const handleEditUser = async (user: IUser) => {
+        setEditUser(user);
 
         try {
-            await fetchRoles(); // Pobierz wszystkie role z API
-
-            // Filtrowanie dostępnych ról
-            const available = roles.filter(
-                (role) => !user.roles.some((r) => r === role) // Porównanie ról po nazwie
+            await fetchRoles();
+            const available = roles.filter((roleString) =>
+                !user.roles.some((r) => r.name === roleString)
             );
-
-            setAvailableRoles(available); // Ustaw dostępne role w stanie
+            setAvailableRoles(available);
         } catch (error) {
             console.error('Błąd podczas pobierania ról:', error);
         }
-        setIsEditUserModalOpen(true); // Otwórz modal
+        setIsEditUserModalOpen(true);
     };
+
     const handleSaveUserEdit = async () => {
+        if (!editUser) return;
         try {
             const token = localStorage.getItem('token');
-
             const updatedUser = {
-                id: editUser.id, // ID użytkownika
+                id: editUser.id,
                 username: editUser.username,
                 email: editUser.email,
-                roles: editUser.roles, // role użytkownika
+                roles: editUser.roles, // array of { id, name }
             };
             await fetch(`${API_URL}/user/edit-user?user-id=${editUser.id}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(updatedUser),
@@ -113,48 +183,53 @@ const AdminPanel = () => {
 
             setIsEditUserModalOpen(false);
             await fetchUsers();
-
         } catch (error) {
             console.error('Błąd podczas zapisywania zmian użytkownika:', error);
         }
     };
-    const toggleUserRole = (role: string) => {
-        const hasRole = editUser.roles.some((r) => r.name === role);
+
+    const toggleUserRole = (roleName: string) => {
+        if (!editUser) return;
+
+        const hasRole = editUser.roles.some((r) => r.name === roleName);
 
         if (hasRole) {
-            // Usuń rolę z użytkownika i dodaj ją z powrotem do dostępnych
-            setEditUser({
-                ...editUser,
-                roles: editUser.roles.filter((r) => r.name !== role),
-            });
-            setAvailableRoles((prevRoles) => [...prevRoles, role]);
+            const updatedRoles = editUser.roles.filter((r) => r.name !== roleName);
+            setEditUser({ ...editUser, roles: updatedRoles });
+            setAvailableRoles((prev) => [...prev, roleName]);
         } else {
-            // Dodaj rolę do użytkownika i usuń ją z dostępnych
-            const newRole = { id: Date.now(), name: role }; // Tymczasowe ID
-            setEditUser({
-                ...editUser,
-                roles: [...editUser.roles, newRole],
-            });
-            setAvailableRoles((prevRoles) => prevRoles.filter((r) => r !== role));
-        }
-    };
-    const nextPage = () => setOffset((prev) => prev + pageSize);
-    const prevPage = () => setOffset((prev) => Math.max(0, prev - pageSize));
-    const handleDelete = (id: number) => {
-        if (window.confirm("Czy na pewno chcesz usunąć to ogłoszenie?")) {
-            AnnouncementService.deleteAnnouncement(id).then(() => {
-                setAnnouncements(announcements.filter(a => a.id !== id));
-            }).catch(console.error);
+            const newRoleObj: IRole = { id: Date.now(), name: roleName };
+            const updatedRoles = [...editUser.roles, newRoleObj];
+            setEditUser({ ...editUser, roles: updatedRoles });
+            setAvailableRoles((prev) => prev.filter((r) => r !== roleName));
         }
     };
 
+    const nextPage = () => setOffset((prev) => prev + pageSize);
+    const prevPage = () => setOffset((prev) => Math.max(0, prev - pageSize));
+
+    const handleDelete = (id: number) => {
+        if (window.confirm("Czy na pewno chcesz usunąć to ogłoszenie?")) {
+            AnnouncementService.deleteAnnouncement(id)
+                .then(() => {
+                    setAnnouncements((prev) => prev.filter(a => a.id !== id));
+                })
+                .catch(console.error);
+        }
+    };
+
+    // PRZYPINANIE/ODPINANIE OGŁOSZENIA
     const handlePinToggle = (id: number) => {
         const announcement = announcements.find(a => a.id === id);
-        if (announcement) {
-            AnnouncementService.togglePinAnnouncement(announcement, !announcement.pinned).then(() => {
-                setAnnouncements(announcements.map(a => a.id === id ? { ...a, pinned: !a.pinned } : a));
-            }).catch(console.error);
-        }
+        if (!announcement) return;
+
+        AnnouncementService.togglePinAnnouncement(announcement, !announcement.pinned)
+            .then(() => {
+                setAnnouncements((prev) =>
+                    prev.map(a => a.id === id ? { ...a, pinned: !a.pinned } : a)
+                );
+            })
+            .catch(console.error);
     };
 
     const handleEdit = (announcement: IAnnouncement) => {
@@ -163,35 +238,40 @@ const AdminPanel = () => {
     };
 
     const handleSaveEdit = () => {
-        if (editAnnouncement) {
-            AnnouncementService.togglePinAnnouncement(editAnnouncement, editAnnouncement.pinned)
-                .then(() => {
-                    setAnnouncements(announcements.map(a => a.id === editAnnouncement.id ? editAnnouncement : a));
-                    handleCloseEditModal();
-                })
-                .catch(console.error);
-        }
+        if (!editAnnouncement) return;
+        AnnouncementService.togglePinAnnouncement(editAnnouncement, editAnnouncement.pinned)
+            .then(() => {
+                setAnnouncements((prev) =>
+                    prev.map(a => (a.id === editAnnouncement.id ? editAnnouncement : a))
+                );
+                handleCloseEditModal();
+            })
+            .catch(console.error);
     };
 
     const handleCloseEditModal = () => {
         setIsEditModalOpen(false);
         setEditAnnouncement(null);
     };
+
     const fetchRoles = async () => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(`${API_URL}/role/get`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                 }
             });
             const data = await response.json();
-            setRoles(data.map((role: { name: string }) => role.name));  // zakładając, że odpowiedź to lista obiektów z rolą
+            // zamieniamy np. [{name: "ROLE_ADMIN"}, ...] na ["ROLE_ADMIN", ...]
+            const rolesFromApi = data.map((role: { name: string }) => role.name);
+            setRoles(rolesFromApi);
         } catch (error) {
             console.error('Błąd podczas pobierania ról:', error);
         }
     };
+
     const handleDeleteRole = async (role: string) => {
         if (window.confirm(`Czy na pewno chcesz usunąć rolę "${role}"?`)) {
             const token = localStorage.getItem('token');
@@ -199,33 +279,34 @@ const AdminPanel = () => {
                 await fetch(`${API_URL}/role/delete?role=${role}`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
+                        Authorization: `Bearer ${token}`,
                     },
                 });
-                setRoles(roles.filter((r) => r !== role));
+                setRoles((prev) => prev.filter((r) => r !== role));
             } catch (error) {
                 console.error('Błąd podczas usuwania roli:', error);
             }
         }
     };
+
     const handleAddRole = async () => {
-        if (newRole) {
-            const token = localStorage.getItem('token');
-            try {
-                await fetch(`${API_URL}/role/add?role=${newRole}`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-                setNewRole('');  // Czyści pole po udanym dodaniu roli
-                fetchRoles();  // Ponownie pobiera listę ról
-            } catch (error) {
-                console.error('Błąd podczas dodawania roli:', error);
-            }
+        if (!newRole) return;
+        const token = localStorage.getItem('token');
+        try {
+            await fetch(`${API_URL}/role/add?role=${newRole}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            setNewRole('');
+            fetchRoles();
+        } catch (error) {
+            console.error('Błąd podczas dodawania roli:', error);
         }
     };
+
     const renderUsers = () => (
         <>
             <input
@@ -275,7 +356,6 @@ const AdminPanel = () => {
                 </tbody>
             </table>
 
-
             <div className="mt-4 flex justify-between">
                 <button
                     onClick={prevPage}
@@ -295,7 +375,7 @@ const AdminPanel = () => {
     );
 
     const renderAnnouncements = () => {
-        const formatDate = (dateString) => {
+        const formatDate = (dateString: string) => {
             const date = new Date(dateString);
             return date.toLocaleDateString('pl-PL', {
                 year: 'numeric',
@@ -320,8 +400,8 @@ const AdminPanel = () => {
                                 <h3 className="text-lg font-semibold text-gray-800">{announcement.title}</h3>
                                 {announcement.pinned && (
                                     <span className="px-3 py-1 text-sm font-bold text-yellow-700 bg-yellow-100 rounded">
-                                    Przypięte
-                                </span>
+                    Przypięte
+                  </span>
                                 )}
                             </div>
                             <p className="text-gray-600 text-sm mb-2">
@@ -336,16 +416,15 @@ const AdminPanel = () => {
                                     onClick={() => handlePinToggle(announcement.id)}
                                     className="flex items-center px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition duration-300"
                                 >
-                                    <MdPushPin className="mr-2"/> {announcement.pinned ? 'Odepnij' : 'Przypnij'}
+                                    <MdPushPin className="mr-2"/>
+                                    {announcement.pinned ? 'Odepnij' : 'Przypnij'}
                                 </button>
-
                                 <button
                                     onClick={() => handleEdit(announcement)}
                                     className="flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition duration-300"
                                 >
                                     <MdEdit className="mr-2"/> Edytuj
                                 </button>
-
                                 <button
                                     onClick={() => handleDelete(announcement.id)}
                                     className="flex items-center px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition duration-300"
@@ -357,7 +436,7 @@ const AdminPanel = () => {
                     ))}
                 </div>
                 <div className="flex justify-center mt-4">
-                    {Array.from({length: totalPages}, (_, index) => (
+                    {Array.from({ length: totalPages }, (_, index) => (
                         <button
                             key={index + 1}
                             onClick={() => setCurrentPage(index + 1)}
@@ -372,10 +451,10 @@ const AdminPanel = () => {
             </>
         );
     };
+
     const renderPermissions = () => (
         <div className="flex">
-            {/* Lewa strona: lista ról */}
-
+            {/* Lista ról */}
             <div className="w-1/3 p-4 bg-gray-100">
                 <h3 className="text-lg font-semibold mb-4">Role</h3>
                 <ul>
@@ -393,6 +472,7 @@ const AdminPanel = () => {
                 </ul>
             </div>
 
+            {/* Dodawanie nowej roli */}
             <div className="w-2/3 p-4">
                 <h3 className="text-lg font-semibold mb-4">Dodaj rolę</h3>
                 <input
@@ -412,8 +492,24 @@ const AdminPanel = () => {
         </div>
     );
 
+    if (isLoading) {
+        return (
+            <div className="p-4">
+                <h2>Ładowanie...</h2>
+            </div>
+        );
+    }
+
+    if (!hasAccess) {
+        return (
+            <div className="p-4 text-red-600">
+                <h2>Brak dostępu do tej strony.</h2>
+            </div>
+        );
+    }
+
     return (
-        <div className="flex flex-col  overflow-hidden">
+        <div className="flex flex-col overflow-hidden">
             <header className="bg-gray-600 text-white p-4 flex-shrink-0">
                 <h1 className="text-xl">Panel Administratora</h1>
             </header>
@@ -421,27 +517,40 @@ const AdminPanel = () => {
                 <aside className="w-64 h-full bg-gray-100 p-4 border-r flex-shrink-0">
                     <div className="space-y-4">
                         <button
-                            className={`block w-fit text-left px-4 py-2 rounded ${selectedSection === 'users' ? 'bg-gray-300' : ''}`}
+                            className={`block w-fit text-left px-4 py-2 rounded ${
+                                selectedSection === 'users' ? 'bg-gray-300' : ''
+                            }`}
                             onClick={() => setSelectedSection('users')}
                         >
                             Zarządzaj użytkownikami
                         </button>
                         <button
-                            className={`block w-fit text-left px-4 py-2 rounded ${selectedSection === 'announcements' ? 'bg-gray-300' : ''}`}
+                            className={`block w-fit text-left px-4 py-2 rounded ${
+                                selectedSection === 'announcements' ? 'bg-gray-300' : ''
+                            }`}
                             onClick={() => setSelectedSection('announcements')}
                         >
                             Zarządzaj ogłoszeniami
                         </button>
                         <button
-                            className={`block w-fit text-left px-4 py-2 rounded ${selectedSection === 'permissions' ? 'bg-gray-300' : ''}`}
+                            className={`block w-fit text-left px-4 py-2 rounded ${
+                                selectedSection === 'permissions' ? 'bg-gray-300' : ''
+                            }`}
                             onClick={() => setSelectedSection('permissions')}
                         >
                             Zarządzaj uprawnieniami
                         </button>
                     </div>
                 </aside>
+
                 <main className="flex-grow p-4 overflow-hidden">
-                    {selectedSection === 'permissions' ? renderPermissions() : selectedSection === 'users' ? renderUsers() : renderAnnouncements()}
+                    {selectedSection === 'permissions'
+                        ? renderPermissions()
+                        : selectedSection === 'users'
+                            ? renderUsers()
+                            : renderAnnouncements()}
+
+                    {/* Modal do edycji użytkownika */}
                     {isEditUserModalOpen && editUser && (
                         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                             <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
@@ -454,7 +563,7 @@ const AdminPanel = () => {
                                         <ul>
                                             {editUser.roles.map((role) => (
                                                 <li key={role.id} className="flex justify-between items-center">
-                                                    <span>{role.name}</span> {/* Wyświetl nazwę roli */}
+                                                    <span>{role.name}</span>
                                                     <button
                                                         onClick={() => toggleUserRole(role.name)}
                                                         className="text-red-500 hover:text-red-700"
@@ -470,12 +579,12 @@ const AdminPanel = () => {
                                         <h3 className="font-semibold mb-2">Dostępne role:</h3>
                                         <ul>
                                             {availableRoles
-                                                .filter((role) => !editUser.roles.some((r) => r.name === role)) // Filtrujemy role
-                                                .map((role) => (
-                                                    <li key={role} className="flex justify-between items-center">
-                                                        <span>{role}</span>
+                                                .filter((roleName) => !editUser.roles.some((r) => r.name === roleName))
+                                                .map((roleName) => (
+                                                    <li key={roleName} className="flex justify-between items-center">
+                                                        <span>{roleName}</span>
                                                         <button
-                                                            onClick={() => toggleUserRole(role)}
+                                                            onClick={() => toggleUserRole(roleName)}
                                                             className="text-green-500 hover:text-green-700"
                                                         >
                                                             Dodaj
@@ -502,6 +611,8 @@ const AdminPanel = () => {
                             </div>
                         </div>
                     )}
+
+                    {/* Modal do edycji ogłoszenia */}
                     {isEditModalOpen && editAnnouncement && (
                         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                             <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
@@ -509,12 +620,16 @@ const AdminPanel = () => {
                                 <input
                                     type="text"
                                     value={editAnnouncement.title}
-                                    onChange={(e) => setEditAnnouncement({ ...editAnnouncement, title: e.target.value })}
+                                    onChange={(e) =>
+                                        setEditAnnouncement({ ...editAnnouncement, title: e.target.value })
+                                    }
                                     className="w-full p-2 border rounded mt-2"
                                 />
                                 <textarea
                                     value={editAnnouncement.content}
-                                    onChange={(e) => setEditAnnouncement({ ...editAnnouncement, content: e.target.value })}
+                                    onChange={(e) =>
+                                        setEditAnnouncement({ ...editAnnouncement, content: e.target.value })
+                                    }
                                     className="w-full p-2 border rounded mt-2"
                                 />
                                 <div className="flex justify-end space-x-2 mt-4">
@@ -534,7 +649,6 @@ const AdminPanel = () => {
                             </div>
                         </div>
                     )}
-
                 </main>
             </div>
         </div>
